@@ -1,0 +1,108 @@
+Software Requirements Specification (SRS) for Pirith App
+======================================================
+
+1. Introduction
+---------------
+1.1 Purpose
+This document outlines the requirements for the Pirith App, a mobile application designed to provide users with access to Pirith audio, Jathaka Katha, Suuthra, and Seth Kavi content, with features for user authentication, audio downloading, and playlist management.
+
+1.2 Scope
+The Pirith App will allow users to:
+- Register and log in using email and password
+- Navigate a dashboard with four sections: Home, Player, Playlist, and Library
+- Access clickable options on the Home screen for Jathaka Katha, Suuthra, Seth Kavi, and Pirith
+- Download Pirith audio files to local storage
+- Play audio files and manage playlists
+- View and manage downloaded content in the Library
+
+1.3 Definitions
+- Pirith: Buddhist chanting audio
+- Jathaka Katha: Stories of the Buddha’s past lives
+- Suuthra: Buddhist discourses
+- Seth Kavi: Blessings or devotional poetry
+- Firebase: Backend platform for authentication, database, and storage
+- Expo: Framework for building React Native apps
+
+2. Overall Description
+---------------------
+2.1 User Needs
+- Users want a simple, calm interface to access Buddhist content.
+- Users need to download Pirith audio for offline use.
+- Users require a way to organize and play audio files.
+
+2.2 Assumptions
+- Users have a smartphone (iOS or Android) with internet access.
+- Audio files are hosted on Firebase Storage.
+- Users are familiar with basic app navigation.
+
+3. Functional Requirements
+-------------------------
+3.1 Authentication
+- FR1: Users shall register with an email and password.
+- FR2: Users shall log in using their credentials.
+- FR3: Users shall log out from the app.
+
+3.2 Dashboard
+- FR4: The app shall display a dashboard with bottom navigation for Home, Player, Playlist, and Library.
+- FR5: The Home screen shall include clickable options for Jathaka Katha, Suuthra, Seth Kavi, and Pirith, each navigating to a dedicated screen.
+
+3.3 Pirith Download
+- FR6: Users shall view a list of available Pirith audio files from Firebase Storage.
+- FR7: Users shall download Pirith audio to local storage using a download button.
+- FR8: The app shall display download progress and confirmation.
+
+3.4 Audio Playback and Playlists
+- FR9: The Player screen shall play local and cloud-based Pirith audio.
+- FR10: The Playlist screen shall allow users to create and manage playlists.
+- FR11: Users shall add downloaded or online Pirith files to playlists.
+
+3.5 Library
+- FR12: The Library screen shall display all downloaded Pirith files.
+- FR13: Users shall delete downloaded files from the Library.
+
+3.6 Content Screens
+- FR14: JathakaKathaScreen, SuuthraScreen, SethKaviScreen, and PirithScreen shall display relevant content (text or audio).
+- FR15: Content screens shall have a consistent design with the app theme.
+
+4. Non-Functional Requirements
+-----------------------------
+4.1 Performance
+- NFR1: The app shall load screens within 2 seconds under normal network conditions.
+- NFR2: Audio playback shall start within 3 seconds.
+
+4.2 Usability
+- NFR3: The app shall use a calm, Buddhist-inspired color scheme (Soft Gold: #FFD700, Deep Maroon: #800000, Off-White: #F5F5F5).
+- NFR4: Navigation shall be intuitive with clear labels and icons.
+
+4.3 Security
+- NFR5: User credentials shall be securely stored using Firebase Authentication.
+- NFR6: Downloaded files shall be accessible only within the app.
+
+4.4 Compatibility
+- NFR7: The app shall support iOS 14+ and Android 10+.
+- NFR8: The app shall work offline for downloaded content.
+
+5. System Architecture
+---------------------
+- Frontend: Expo React Native with TypeScript
+- Backend: Firebase (Authentication, Firestore for metadata, Storage for audio files)
+- Local Storage: Expo FileSystem for downloaded audio
+- Navigation: React Navigation (Stack and Bottom Tabs)
+
+6. Constraints
+--------------
+- The app must use Expo for cross-platform compatibility.
+- Audio files must be hosted on Firebase Storage.
+- The app must adhere to a Buddhist-themed aesthetic.
+
+7. Deliverables
+---------------
+- Source code in the PirithApp repository
+- Deployable app via Expo Go
+- Documentation (Project Plan, SRS)
+- Custom assets (icons, images) reflecting Buddhist culture
+
+8. Approval
+-----------
+- Developer: [Your Name]
+- Date: July 15, 2025
