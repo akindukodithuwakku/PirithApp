@@ -70,7 +70,7 @@ export function LoginScreen() {
       const remembered = await SecureStore.getItemAsync("pirith_user");
       if (remembered) {
         // @ts-ignore
-        navigation.reset({ index: 0, routes: [{ name: "Home" }] });
+        navigation.reset({ index: 0, routes: [{ name: "Dashboard" }] });
       }
     })();
   }, [navigation]);
@@ -94,6 +94,7 @@ export function LoginScreen() {
       password: state.password,
     });
     if (!result.success) {
+      // @ts-ignore
       dispatch({ type: "SET_ERROR", payload: result.error.errors[0].message });
       return;
     }
@@ -110,7 +111,7 @@ export function LoginScreen() {
       }
       dispatch({ type: "SET_LOADING", payload: false });
       // @ts-ignore
-      navigation.reset({ index: 0, routes: [{ name: "Home" }] });
+      navigation.reset({ index: 0, routes: [{ name: "Dashboard" }] });
     } catch (error: any) {
       dispatch({ type: "SET_LOADING", payload: false });
       dispatch({ type: "SET_ERROR", payload: error.message || "Login failed" });
@@ -182,6 +183,7 @@ export function LoginScreen() {
       </Pressable>
       <Pressable
         style={styles.link}
+        // @ts-ignore
         onPress={() => navigation.navigate("Register")}
         accessibilityRole="button"
         accessibilityLabel="Go to register"

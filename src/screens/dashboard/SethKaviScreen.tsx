@@ -3,12 +3,12 @@ import { View, Text, StyleSheet } from "react-native";
 import { Header } from "../../components/common/Header";
 import { ScreenBackground } from "../../components/common/ScreenBackground";
 
-export function PirithScreen() {
+export function SethKaviScreen() {
   return (
     <ScreenBackground>
-      <Header title="Pirith" />
+      <Header title="Seth Kavi" />
       <View style={styles.content}>
-        <Text style={styles.header}>Pirith</Text>
+        <Text style={styles.header}>Seth Kavi</Text>
       </View>
     </ScreenBackground>
   );

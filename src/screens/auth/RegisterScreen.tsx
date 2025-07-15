@@ -100,6 +100,7 @@ export function RegisterScreen() {
       confirmPassword: state.confirmPassword,
     });
     if (!result.success) {
+      // @ts-ignore
       dispatch({ type: "SET_ERROR", payload: result.error.errors[0].message });
       return;
     }
@@ -118,7 +119,7 @@ export function RegisterScreen() {
       }
       dispatch({ type: "SET_LOADING", payload: false });
       // @ts-ignore
-      navigation.reset({ index: 0, routes: [{ name: "Home" }] });
+      navigation.reset({ index: 0, routes: [{ name: "Dashboard" }] });
     } catch (error: any) {
       dispatch({ type: "SET_LOADING", payload: false });
       dispatch({
@@ -211,6 +212,7 @@ export function RegisterScreen() {
       </Pressable>
       <Pressable
         style={styles.link}
+        // @ts-ignore
         onPress={() => navigation.goBack()}
         accessibilityRole="button"
         accessibilityLabel="Back to login"
@@ -220,7 +222,6 @@ export function RegisterScreen() {
     </View>
   );
 }
-
 
 //styles
 const styles = StyleSheet.create({
