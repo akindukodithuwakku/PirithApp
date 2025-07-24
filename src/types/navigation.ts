@@ -9,6 +9,7 @@ export type RootStackParamList = {
   [ScreenNames.BODHI_POOJA]: undefined;
   [ScreenNames.JATHAKA_KATHA]: undefined;
   [ScreenNames.REFERENCE]: undefined;
+  ["SuthraDetail"]: { suthraKey: string };
 };
 
 export type DashboardScreenNavigationProp = StackNavigationProp<

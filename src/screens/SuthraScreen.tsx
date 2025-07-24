@@ -1,8 +1,25 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../types/navigation";
+import { SUTHRA_DATA } from "../constants/suthraData";
 import { Colors } from "../constants/Colors";
 
+const { width } = Dimensions.get("window");
+
 const SuthraScreen: React.FC = () => {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const suthraList = Object.values(SUTHRA_DATA);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -10,21 +27,30 @@ const SuthraScreen: React.FC = () => {
         contentContainerStyle={styles.content}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Sacred Buddhist Texts</Text>
-          <Text style={styles.subtitle}>Suthra Collection</Text>
-        </View>
-
-        <View style={styles.contentSection}>
-          <Text style={styles.sectionTitle}>Coming Soon</Text>
-          <Text style={styles.description}>
-            Sacred Buddhist texts and teachings will be available here. Explore
-            the wisdom of the Buddha through ancient scriptures.
+          <Text style={styles.subtitle}>
+            වැදගත් සුත්‍ර දේශනාවන්, පාලි සහ එහි සිංහල අරුත සමගින්
           </Text>
         </View>
-
-        <View style={styles.decoration}>
-          <Text style={styles.decorationText}>📜</Text>
-        </View>
+        {suthraList.map((suthra) => (
+          <TouchableOpacity
+            key={suthra.key}
+            style={styles.card}
+            activeOpacity={0.85}
+            onPress={() =>
+              navigation.navigate("SuthraDetail", { suthraKey: suthra.key })
+            }
+            accessibilityRole="button"
+            accessibilityLabel={suthra.title}
+          >
+            <View style={styles.cardContent}>
+              <Text style={styles.cardIcon}>{suthra.icon}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.cardTitle}>{suthra.title}</Text>
+                <Text style={styles.cardSubtext}>{suthra.subtext}</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -40,48 +66,53 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+    paddingBottom: 40,
   },
   header: {
     alignItems: "center",
-    marginBottom: 30,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: Colors.text,
-    textAlign: "center",
-    marginBottom: 8,
+    marginBottom: 24,
   },
   subtitle: {
     fontSize: 16,
     color: Colors.textSecondary,
     textAlign: "center",
+    marginBottom: 10,
   },
-  contentSection: {
-    backgroundColor: Colors.surface,
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: Colors.secondary,
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  description: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    lineHeight: 24,
-    textAlign: "center",
-  },
-  decoration: {
+  card: {
+    width: width * 0.92,
+    backgroundColor: Colors.overlay,
+    borderRadius: 18,
+    marginVertical: 10,
+    padding: 18,
+    flexDirection: "row",
     alignItems: "center",
-    marginTop: 40,
+    shadowColor: Colors.shadow,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: Colors.semiTransparent,
+    // transition: 'all 0.2s', // Removed, not supported in React Native
   },
-  decorationText: {
-    fontSize: 60,
+  cardContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cardIcon: {
+    fontSize: 32,
+    marginRight: 18,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  cardSubtext: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    opacity: 0.85,
   },
 });
 

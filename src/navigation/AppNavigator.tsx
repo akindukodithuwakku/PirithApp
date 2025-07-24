@@ -11,6 +11,7 @@ import PirithScreen from "../screens/PirithScreen";
 import BodhiPoojaScreen from "../screens/BodhiPoojaScreen";
 import JathakaKathaScreen from "../screens/JathakaKathaScreen";
 import ReferenceScreen from "../screens/Refference";
+import SuthraDetailScreen from "../screens/SuthraDetailScreen";
 
 const Stack = createStackNavigator();
 
@@ -81,6 +82,17 @@ const AppNavigator: React.FC = () => {
           options={{
             title: "Reference",
             headerTitleAlign: "center",
+          }}
+        />
+        <Stack.Screen
+          name="SuthraDetail"
+          component={SuthraDetailScreen}
+          options={{
+            title: "",
+            headerTitleAlign: "center",
+            headerBackTitleVisible: false,
+            headerTintColor: Colors.text,
+            headerStyle: { backgroundColor: Colors.surface },
           }}
         />
       </Stack.Navigator>
