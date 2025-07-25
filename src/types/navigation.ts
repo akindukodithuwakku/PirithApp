@@ -1,6 +1,8 @@
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RouteProp } from "@react-navigation/native";
 import { ScreenNames } from "../constants/ScreenNames";
+import { SuthraData } from "../constants/suthraData";
+import { PirithData } from "../constants/pirithData";
 
 export type RootStackParamList = {
   [ScreenNames.DASHBOARD]: undefined;
@@ -9,7 +11,8 @@ export type RootStackParamList = {
   [ScreenNames.BODHI_POOJA]: undefined;
   [ScreenNames.JATHAKA_KATHA]: undefined;
   [ScreenNames.REFERENCE]: undefined;
-  ["SuthraDetail"]: { suthraKey: string };
+  [ScreenNames.SUTHRA_DETAIL]: { suthra: SuthraData };
+  [ScreenNames.PIRITH_DETAIL]: { pirith: PirithData };
 };
 
 export type DashboardScreenNavigationProp = StackNavigationProp<

@@ -11,11 +11,12 @@ import {
 import DashboardCard from "../components/DashboardCard";
 import { Colors } from "../constants/Colors";
 import { ScreenNames } from "../constants/ScreenNames";
-import { NavigationProps } from "../types/navigation";
 
 const { width, height } = Dimensions.get("window");
 
-interface DashboardProps extends NavigationProps {}
+interface DashboardProps {
+  navigation: any;
+}
 
 const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
   const handleNavigate = (screenName: string) => {
@@ -96,7 +97,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.welcomeSection}>
-          <Text style={styles.welcomeTitle}>ධම්ම දාන වෙත සාදරයෙන් පිළිගනිමු</Text>
+          <Text style={styles.welcomeTitle}>
+            ධම්ම දාන වෙත සාදරයෙන් පිළිගනිමු
+          </Text>
           <Text style={styles.welcomeText}>
             බුදුදහමේ පූජනීය ඉගැන්වීම් සහ පිළිවෙත් ගවේෂණය කරමු
           </Text>
