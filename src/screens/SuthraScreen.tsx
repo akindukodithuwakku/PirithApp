@@ -37,7 +37,7 @@ const SuthraScreen: React.FC = () => {
             style={styles.card}
             activeOpacity={0.85}
             onPress={() =>
-              navigation.navigate("SuthraDetail", { suthraKey: suthra.key })
+              navigation.navigate("SuthraDetail", { suthra: suthra })
             }
             accessibilityRole="button"
             accessibilityLabel={suthra.title}

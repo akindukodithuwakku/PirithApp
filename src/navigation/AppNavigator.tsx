@@ -7,6 +7,7 @@ import { ScreenNames } from "../constants/ScreenNames";
 import Dashboard from "../screens/Dashboard";
 import SuthraScreen from "../screens/SuthraScreen";
 import PirithScreen from "../screens/PirithScreen";
+import PirithDetailWrapper from "../screens/PirithDetailWrapper";
 import BodhiPoojaScreen from "../screens/BodhiPoojaScreen";
 import JathakaKathaScreen from "../screens/JathakaKathaScreen";
 import ReferenceScreen from "../screens/Refference";
@@ -29,7 +30,6 @@ const AppNavigator: React.FC = () => {
           fontWeight: "bold",
           fontSize: 18,
         },
-        headerBackTitleVisible: false,
         cardStyle: {
           backgroundColor: Colors.background,
         },
@@ -88,7 +88,16 @@ const AppNavigator: React.FC = () => {
         options={{
           title: "",
           headerTitleAlign: "center",
-          headerBackTitleVisible: false,
+          headerTintColor: Colors.text,
+          headerStyle: { backgroundColor: Colors.surface },
+        }}
+      />
+      <Stack.Screen
+        name="PirithDetail"
+        component={PirithDetailWrapper}
+        options={{
+          title: "",
+          headerTitleAlign: "center",
           headerTintColor: Colors.text,
           headerStyle: { backgroundColor: Colors.surface },
         }}

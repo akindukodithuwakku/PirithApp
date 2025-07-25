@@ -2,21 +2,21 @@ import React from "react";
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
   SafeAreaView,
   Dimensions,
 } from "react-native";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { SuthraData } from "../constants/suthraData";
 import { Colors } from "../constants/Colors";
+import { PirithData } from "../constants/pirithData";
 
-interface SuthraDetailRouteParams {
-  suthra: SuthraData;
+interface PirithDetailRouteParams {
+  pirith: PirithData;
 }
 
-type SuthraDetailRouteProp = RouteProp<
-  { params: SuthraDetailRouteParams },
+type PirithDetailRouteProp = RouteProp<
+  { params: PirithDetailRouteParams },
   "params"
 >;
 
@@ -30,22 +30,22 @@ function splitStanzas(text: string): string[] {
     .filter((s) => s.length > 0);
 }
 
-const SuthraDetailScreen: React.FC = () => {
-  const route = useRoute<SuthraDetailRouteProp>();
-  const { suthra } = route.params;
+const PirithDetailScreen: React.FC = () => {
+  const route = useRoute<PirithDetailRouteProp>();
+  const { pirith } = route.params;
 
-  if (!suthra) {
+  if (!pirith) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Suthra not found.</Text>
+          <Text style={styles.errorText}>Pirith not found.</Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  const paliStanzas = splitStanzas(suthra.pali);
-  const sinhalaStanzas = splitStanzas(suthra.sinhala);
+  const paliStanzas = splitStanzas(pirith.pali);
+  const sinhalaStanzas = splitStanzas(pirith.sinhala);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -54,9 +54,10 @@ const SuthraDetailScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>{suthra.title}</Text>
-          <Text style={styles.subtext}>{suthra.subtext}</Text>
+          <Text style={styles.title}>{pirith.title}</Text>
+          <Text style={styles.subtext}>{pirith.subtext}</Text>
         </View>
+
         {/* Pali Section */}
         <View style={styles.sectionFull}>
           <Text style={styles.sectionLabel}>පාලි භාෂාවෙන්</Text>
@@ -68,6 +69,7 @@ const SuthraDetailScreen: React.FC = () => {
             </View>
           ))}
         </View>
+
         {/* Sinhala Section */}
         <View style={styles.sectionFull}>
           <Text style={styles.sectionLabel}>සිංහල අරුත්</Text>
@@ -98,10 +100,6 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     paddingTop: 24,
     paddingHorizontal: 16,
-  },
-  icon: {
-    fontSize: 48,
-    marginBottom: 8,
   },
   title: {
     fontSize: 28,
@@ -159,4 +157,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SuthraDetailScreen;
+export { PirithDetailScreen };
+export default PirithDetailScreen;
