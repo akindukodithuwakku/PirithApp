@@ -10,8 +10,10 @@ import WasalaPali from "../screens/suuthra/pali/WasalaPali";
 import WasalaSinhala from "../screens/suuthra/sinhala/WasalaSinhala";
 import RathnamaliPali from "../screens/suuthra/pali/RathnamaliPali";
 import RathnamaliSinhala from "../screens/suuthra/sinhala/RathnamaliSinhala";
-
-
+import GirimanandaPali from "../screens/suuthra/pali/GirimanandaPali";
+import GirimanandaSinhala from "../screens/suuthra/sinhala/GirimanandSinhala";  
+import ChakkawaththiPali from "../screens/suuthra/pali/ChakkawaththiPali";
+import ChakkawaththiSinhala from "../screens/suuthra/sinhala/ChakkawaththiSinhala";
 
 export interface SuthraData {
   key: string;
@@ -53,7 +55,7 @@ export const SUTHRA_DATA: Record<string, SuthraData> = {
   parabawa: {
     key: "parabawa",
     title: "පරාබව සූත්‍රය",
-    subtext: "පරාබව කරුණු",
+    subtext: "පිරිහීමේ කරුණු",
     pali: ParabawaPali,
     sinhala: ParabawaSinhala,
     icon: "📜",
@@ -74,6 +76,25 @@ export const SUTHRA_DATA: Record<string, SuthraData> = {
     subtext: "රත්නමාලි කරුණු",
     pali: RathnamaliPali,
     sinhala: RathnamaliSinhala,
+    icon: "📜",
+  },
+
+  girimananda: {
+    key: "girimananda",
+    title: "ගිරිමාන්න සූත්‍රය",
+    subtext: "ගිරිමාන්න කරුණු",
+    pali: GirimanandaPali,
+    sinhala: GirimanandaSinhala,
+    icon: "📜",
+  },
+
+  chakkawaththi: {
+
+    key: "chakkawaththi",
+    title: "චක්කවත්ති සූත්‍රය",
+    subtext: "චක්කවත්ති කරුණු",
+    pali: ChakkawaththiPali,
+    sinhala: ChakkawaththiSinhala,
     icon: "📜",
   },
 
