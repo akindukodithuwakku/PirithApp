@@ -1,0 +1,40 @@
+name: Deploy Website
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy-website:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install website dependencies
+        run: |
+          cd website
+          npm install
+
+      - name: Build website
+        run: |
+          cd website
+          npm run build
+        env:
+          REACT_APP_GITHUB_REPO: ${{ github.repository }}
+          REACT_APP_LATEST_RELEASE: v${{ github.run_number }}
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./website/build
+          force_orphan: true
