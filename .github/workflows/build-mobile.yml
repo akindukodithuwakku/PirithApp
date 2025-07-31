@@ -21,6 +21,8 @@ concurrency:
 jobs:
   build-android:
     runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     if: (github.event_name == 'workflow_dispatch' && github.event.inputs.platform == 'android') || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     steps:
       - name: Checkout code
@@ -41,8 +43,6 @@ jobs:
       - name: Build Android APK
         run: |
           eas build --platform android --profile preview --non-interactive --output=./android-release.apk
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
@@ -52,6 +52,8 @@ jobs:
 
   build-ios:
     runs-on: macos-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     if: (github.event_name == 'workflow_dispatch' && github.event.inputs.platform == 'ios') || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     steps:
       - name: Checkout code
@@ -72,8 +74,6 @@ jobs:
       - name: Build iOS
         run: |
           eas build --platform ios --profile preview --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
   create-release:
     needs: [build-android, build-ios]

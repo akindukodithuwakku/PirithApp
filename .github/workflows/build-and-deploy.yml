@@ -57,6 +57,8 @@ jobs:
   # Android build
   build-android:
     runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -76,8 +78,6 @@ jobs:
       - name: Build Android APK
         run: |
           eas build --platform android --profile preview --non-interactive --output=./android-release.apk
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
@@ -88,6 +88,8 @@ jobs:
   # iOS build
   build-ios:
     runs-on: macos-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -107,8 +109,6 @@ jobs:
       - name: Build iOS
         run: |
           eas build --platform ios --profile preview --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
   # Create release with mobile builds
   create-release:
