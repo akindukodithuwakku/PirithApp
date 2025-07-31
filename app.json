@@ -7,11 +7,14 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "owner": "akindukodithuwakku",
+    "owner": "akindu2002",
     "extra": {
       "eas": {
         "projectId": "b123e251-6350-4b36-bc0b-5a3bbb8fce9f"
       }
+    },
+    "cli": {
+      "appVersionSource": "remote"
     },
     "splash": {
       "image": "./assets/splash-icon.png",
