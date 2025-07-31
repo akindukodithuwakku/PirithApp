@@ -1,27 +1,63 @@
-name: Build Mobile Apps
+name: Build and Deploy
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      platform:
-        description: 'Platform to build for'
-        required: true
-        default: 'android'
-        type: choice
-        options:
-        - android
-        - ios
 
 concurrency:
-  group: "mobile-build"
+  group: "build-deploy"
   cancel-in-progress: true
 
 jobs:
+  # Website deployment
+  deploy-website:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install website dependencies
+        run: |
+          cd website
+          npm ci
+
+      - name: Build website
+        run: |
+          cd website
+          npm run build
+        env:
+          REACT_APP_GITHUB_REPO: ${{ github.repository }}
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "./website/build"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Android build
   build-android:
     runs-on: ubuntu-latest
-    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.platform == 'android') || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    if: ${{ secrets.EXPO_TOKEN != '' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -54,9 +90,10 @@ jobs:
           name: android-apk
           path: ./android-release.apk
 
+  # iOS build
   build-ios:
     runs-on: macos-latest
-    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.platform == 'ios') || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    if: ${{ secrets.EXPO_TOKEN != '' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -83,6 +120,7 @@ jobs:
         run: |
           eas build --platform ios --profile preview --non-interactive
 
+  # Create release with mobile builds
   create-release:
     needs: [build-android, build-ios]
     runs-on: ubuntu-latest
@@ -123,11 +161,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  skip-build:
+  # Skip mobile builds if no token
+  skip-mobile:
     runs-on: ubuntu-latest
     if: ${{ secrets.EXPO_TOKEN == '' }}
     steps:
-      - name: Skip Build
+      - name: Skip Mobile Build
         run: |
           echo "Skipping mobile build - EXPO_TOKEN not configured"
           echo "To enable mobile builds, add EXPO_TOKEN to repository secrets"
