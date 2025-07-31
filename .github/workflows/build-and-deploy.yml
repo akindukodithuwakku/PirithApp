@@ -77,11 +77,13 @@ jobs:
         run: |
           echo ${{ secrets.EXPO_TOKEN }} | eas login
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_TOKEN: ""
 
       - name: Build Android APK
         run: |
           eas build --platform android --profile preview --non-interactive --output=./android-release.apk
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
@@ -112,11 +114,13 @@ jobs:
         run: |
           echo ${{ secrets.EXPO_TOKEN }} | eas login
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_TOKEN: ""
 
       - name: Build iOS
         run: |
           eas build --platform ios --profile preview --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
   # Create release with mobile builds
   create-release:
