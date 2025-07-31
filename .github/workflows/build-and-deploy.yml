@@ -88,13 +88,12 @@ jobs:
 
       - name: Setup EAS Authentication
         run: |
-          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+          if [ -z "$EXPO_TOKEN" ]; then
             echo "Error: EXPO_TOKEN is not set or is empty"
             exit 1
           fi
-          mkdir -p ~/.expo
-          echo "{\"auth\":{\"sessionSecret\":\"${{ secrets.EXPO_TOKEN }}\"}}" > ~/.expo/state.json
-          cat ~/.expo/state.json # Output for debugging
+          echo "EXPO_TOKEN is set and ready for EAS authentication"
+          # EAS CLI will automatically use EXPO_TOKEN environment variable
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
@@ -103,6 +102,7 @@ jobs:
           # Run the cloud build without --output
           eas build --platform android --profile preview --non-interactive
         env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           REACT_APP_GITHUB_REPO: ${{ github.repository }}
 
       - name: Download Android APK
@@ -141,13 +141,12 @@ jobs:
 
       - name: Setup EAS Authentication
         run: |
-          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+          if [ -z "$EXPO_TOKEN" ]; then
             echo "Error: EXPO_TOKEN is not set or is empty"
             exit 1
           fi
-          mkdir -p ~/.expo
-          echo "{\"auth\":{\"sessionSecret\":\"${{ secrets.EXPO_TOKEN }}\"}}" > ~/.expo/state.json
-          cat ~/.expo/state.json # Output for debugging
+          echo "EXPO_TOKEN is set and ready for EAS authentication"
+          # EAS CLI will automatically use EXPO_TOKEN environment variable
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
@@ -155,6 +154,7 @@ jobs:
         run: |
           eas build --platform ios --profile preview --non-interactive
         env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           REACT_APP_GITHUB_REPO: ${{ github.repository }}
 
       - name: Download iOS IPA
