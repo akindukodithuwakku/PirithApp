@@ -122,13 +122,3 @@ jobs:
             ./artifacts/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  skip-build:
-    runs-on: ubuntu-latest
-    if: ${{ secrets.EXPO_TOKEN == '' }}
-    steps:
-      - name: Skip Build
-        run: |
-          echo "Skipping mobile build - EXPO_TOKEN not configured"
-          echo "To enable mobile builds, add EXPO_TOKEN to repository secrets"
-          echo "Get your token from: https://expo.dev/accounts/[username]/settings/access-tokens"
