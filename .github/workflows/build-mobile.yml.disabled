@@ -1,21 +1,14 @@
 name: Build Mobile Apps
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
-    inputs:
-      platform:
-        description: 'Platform to build for'
-        required: true
-        default: 'android'
-        type: choice
-        options:
-        - android
-        - ios
 
 jobs:
   build-android:
     runs-on: ubuntu-latest
-    if: github.event.inputs.platform == 'android' && secrets.EXPO_TOKEN != ''
+    if: secrets.EXPO_TOKEN != ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -48,39 +41,10 @@ jobs:
           name: android-apk
           path: ./android-release.apk
 
-  build-ios:
-    runs-on: macos-latest
-    if: github.event.inputs.platform == 'ios' && secrets.EXPO_TOKEN != ''
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Setup Expo CLI
-        run: npm install -g @expo/cli eas-cli
-
-      - name: Login to Expo
-        run: |
-          echo ${{ secrets.EXPO_TOKEN }} | eas login --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Build iOS
-        run: |
-          eas build --platform ios --profile preview --non-interactive
-
   create-release:
-    needs: [build-android, build-ios]
+    needs: [build-android]
     runs-on: ubuntu-latest
-    if: always() && (needs.build-android.result == 'success' || needs.build-ios.result == 'success')
+    if: github.ref == 'refs/heads/main' && secrets.EXPO_TOKEN != ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -90,7 +54,6 @@ jobs:
         with:
           name: android-apk
           path: ./artifacts
-        if: needs.build-android.result == 'success'
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -123,4 +86,4 @@ jobs:
         run: |
           echo "Skipping mobile build - EXPO_TOKEN not configured"
           echo "To enable mobile builds, add EXPO_TOKEN to repository secrets"
-          echo "Get your token from: https://expo.dev/accounts/[username]/settings/access-tokens" 
+          echo "Get your token from: https://expo.dev/accounts/[username]/settings/access-tokens"

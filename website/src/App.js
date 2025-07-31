@@ -26,12 +26,14 @@ function App() {
       const response = await fetch(
         `https://api.github.com/repos/${repo}/releases/latest`
       );
-      
+
       if (!response.ok) {
         if (response.status === 404) {
           // No releases found - this is expected for new repositories
           setLatestRelease(null);
-          setError("No releases available yet. The app is still in development.");
+          setError(
+            "No releases available yet. The app is still in development."
+          );
         } else {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -156,10 +158,11 @@ function App() {
                   </h3>
                   <p className="text-yellow-700 mb-4">{error}</p>
                   <p className="text-yellow-600 text-sm">
-                    The app is currently being developed and will be available for download soon.
+                    The app is currently being developed and will be available
+                    for download soon.
                   </p>
                 </div>
-                
+
                 {/* Development Status */}
                 <div className="mt-8 grid md:grid-cols-2 gap-6">
                   <div className="border-2 border-gray-200 rounded-xl p-6">
@@ -180,7 +183,9 @@ function App() {
                   <div className="border-2 border-gray-200 rounded-xl p-6">
                     <div className="flex items-center mb-4">
                       <ComputerDesktopIcon className="w-8 h-8 text-blue-500 mr-3" />
-                      <h4 className="text-xl font-semibold text-gray-800">iOS</h4>
+                      <h4 className="text-xl font-semibold text-gray-800">
+                        iOS
+                      </h4>
                     </div>
                     <p className="text-gray-600 mb-4">
                       iOS version coming soon
