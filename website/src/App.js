@@ -12,6 +12,7 @@ import {
 function App() {
   const [latestRelease, setLatestRelease] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchLatestRelease();
@@ -19,15 +20,28 @@ function App() {
 
   const fetchLatestRelease = async () => {
     try {
+      setError(null);
       const repo =
         process.env.REACT_APP_GITHUB_REPO || "akindukodithuwakku/PirithApp";
       const response = await fetch(
         `https://api.github.com/repos/${repo}/releases/latest`
       );
-      const data = await response.json();
-      setLatestRelease(data);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          // No releases found - this is expected for new repositories
+          setLatestRelease(null);
+          setError("No releases available yet. The app is still in development.");
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } else {
+        const data = await response.json();
+        setLatestRelease(data);
+      }
     } catch (error) {
       console.error("Error fetching latest release:", error);
+      setError("Failed to fetch release information. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -133,6 +147,51 @@ function App() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-buddhist-500 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading latest release...</p>
             </div>
+          ) : error ? (
+            <div className="bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto">
+              <div className="text-center">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                  <h3 className="text-xl font-semibold text-yellow-800 mb-2">
+                    Development in Progress
+                  </h3>
+                  <p className="text-yellow-700 mb-4">{error}</p>
+                  <p className="text-yellow-600 text-sm">
+                    The app is currently being developed and will be available for download soon.
+                  </p>
+                </div>
+                
+                {/* Development Status */}
+                <div className="mt-8 grid md:grid-cols-2 gap-6">
+                  <div className="border-2 border-gray-200 rounded-xl p-6">
+                    <div className="flex items-center mb-4">
+                      <DevicePhoneMobileIcon className="w-8 h-8 text-green-500 mr-3" />
+                      <h4 className="text-xl font-semibold text-gray-800">
+                        Android
+                      </h4>
+                    </div>
+                    <p className="text-gray-600 mb-4">
+                      Android version coming soon
+                    </p>
+                    <div className="bg-gray-100 text-gray-500 font-semibold py-3 px-6 rounded-lg text-center">
+                      Coming Soon
+                    </div>
+                  </div>
+
+                  <div className="border-2 border-gray-200 rounded-xl p-6">
+                    <div className="flex items-center mb-4">
+                      <ComputerDesktopIcon className="w-8 h-8 text-blue-500 mr-3" />
+                      <h4 className="text-xl font-semibold text-gray-800">iOS</h4>
+                    </div>
+                    <p className="text-gray-600 mb-4">
+                      iOS version coming soon
+                    </p>
+                    <div className="bg-gray-100 text-gray-500 font-semibold py-3 px-6 rounded-lg text-center">
+                      Coming Soon
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           ) : latestRelease ? (
             <div className="bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto">
               <div className="text-center mb-8">
@@ -143,17 +202,19 @@ function App() {
                   Released on{" "}
                   {new Date(latestRelease.published_at).toLocaleDateString()}
                 </p>
-                <div className="bg-buddhist-50 rounded-lg p-4 text-left">
-                  <h4 className="font-semibold text-gray-800 mb-2">
-                    What's New:
-                  </h4>
-                  <div
-                    className="text-gray-600 prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{
-                      __html: latestRelease.body.replace(/\n/g, "<br/>"),
-                    }}
-                  />
-                </div>
+                {latestRelease.body && (
+                  <div className="bg-buddhist-50 rounded-lg p-4 text-left">
+                    <h4 className="font-semibold text-gray-800 mb-2">
+                      What's New:
+                    </h4>
+                    <div
+                      className="text-gray-600 prose prose-sm max-w-none"
+                      dangerouslySetInnerHTML={{
+                        __html: latestRelease.body.replace(/\n/g, "<br/>"),
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
