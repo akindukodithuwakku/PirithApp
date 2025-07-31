@@ -125,4 +125,5 @@ jobs:
           files: |
             ./artifacts/*.apk
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          env:
+             EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
