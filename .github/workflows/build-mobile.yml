@@ -21,8 +21,6 @@ concurrency:
 jobs:
   build-android:
     runs-on: ubuntu-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     if: (github.event_name == 'workflow_dispatch' && github.event.inputs.platform == 'android') || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     steps:
       - name: Checkout code
@@ -40,6 +38,11 @@ jobs:
       - name: Setup Expo CLI
         run: npm install -g @expo/cli eas-cli
 
+      - name: Setup EAS Authentication
+        run: |
+          mkdir -p ~/.expo
+          echo '{"accessToken":"${{ secrets.EXPO_TOKEN }}"}' > ~/.expo/state.json
+
       - name: Build Android APK
         run: |
           eas build --platform android --profile preview --non-interactive --output=./android-release.apk
@@ -52,8 +55,6 @@ jobs:
 
   build-ios:
     runs-on: macos-latest
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     if: (github.event_name == 'workflow_dispatch' && github.event.inputs.platform == 'ios') || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     steps:
       - name: Checkout code
@@ -70,6 +71,11 @@ jobs:
 
       - name: Setup Expo CLI
         run: npm install -g @expo/cli eas-cli
+
+      - name: Setup EAS Authentication
+        run: |
+          mkdir -p ~/.expo
+          echo '{"accessToken":"${{ secrets.EXPO_TOKEN }}"}' > ~/.expo/state.json
 
       - name: Build iOS
         run: |
