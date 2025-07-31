@@ -28,7 +28,7 @@ export const SUTHRA_DATA: Record<string, SuthraData> = {
   rathana: {
     key: "rathana",
     title: "රතන සූත්‍රය",
-    subtext: "තුන් බිය දුරු කරගැනීම",
+    subtext: "තුන් බිය දුරු කරගැනීම පිළිබද දෙසූ සූත්‍ර දේශනාව",
     pali: RathanaPali,
     sinhala: RathanaSinhala,
     icon: "📜",
@@ -37,7 +37,7 @@ export const SUTHRA_DATA: Record<string, SuthraData> = {
   mangala: {
     key: "mangala",
     title: "මහා මංගල සූත්‍රය",
-    subtext: "මංගල කරුණු",
+    subtext: "මංගල කරුණු පිළිබද දෙසූ සූත්‍ර දේශනාව",
     pali: MangalaPali,
     sinhala: MangalaSinhala,
     icon: "📜",
@@ -46,7 +46,7 @@ export const SUTHRA_DATA: Record<string, SuthraData> = {
   karaniya: {
     key: "karaniya",
     title: "කරණියමෙත්ත  සූත්‍රය",
-    subtext: "කරණිය කරුණු",
+    subtext: "කරණිය කරුණු පිළිබද දෙසූ සූත්‍ර දේශනාව",
     pali: KaraniyaPali,
     sinhala: KaraniyaSinhala,
     icon: "📜",
@@ -55,7 +55,7 @@ export const SUTHRA_DATA: Record<string, SuthraData> = {
   parabawa: {
     key: "parabawa",
     title: "පරාබව සූත්‍රය",
-    subtext: "පිරිහීමේ කරුණු",
+    subtext: "පිරිහීමේ කරුණු පිළිබද දෙසූ සූත්‍ර දේශනාව",
     pali: ParabawaPali,
     sinhala: ParabawaSinhala,
     icon: "📜",
@@ -64,7 +64,7 @@ export const SUTHRA_DATA: Record<string, SuthraData> = {
   wasala: {
     key: "wasala",
     title: "වසල සූත්‍රය",
-    subtext: "වසල කරුණු",
+    subtext: "පුද්ගලයෙකු වසලයෙකු වීමේ කරුණු පිළිබද දෙසූ සූත්‍ර දේශනාව",
     pali: WasalaPali,
     sinhala: WasalaSinhala,
     icon: "📜",
@@ -73,7 +73,7 @@ export const SUTHRA_DATA: Record<string, SuthraData> = {
   rathnamali: {
     key: "rathnamali",
     title: "රත්නමාලි සූත්‍රය",
-    subtext: "රත්නමාලි කරුණු",
+    subtext: "",
     pali: RathnamaliPali,
     sinhala: RathnamaliSinhala,
     icon: "📜",
@@ -82,7 +82,7 @@ export const SUTHRA_DATA: Record<string, SuthraData> = {
   girimananda: {
     key: "girimananda",
     title: "ගිරිමාන්න සූත්‍රය",
-    subtext: "ගිරිමාන්න කරුණු",
+    subtext: "ගිලන්ව සිටි ගිරිමාන්නන්ද ස්වාමීන්වහන්සේට දෙසූ සූත්‍ර දේශනාව",
     pali: GirimanandaPali,
     sinhala: GirimanandaSinhala,
     icon: "📜",
