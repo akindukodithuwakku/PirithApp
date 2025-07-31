@@ -88,16 +88,29 @@ jobs:
 
       - name: Setup EAS Authentication
         run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "Error: EXPO_TOKEN is not set or is empty"
+            exit 1
+          fi
           mkdir -p ~/.expo
-          echo '{"auth":{"sessionSecret":"${{ secrets.EXPO_TOKEN }}"}}' > ~/.expo/state.json
+          echo "{\"auth\":{\"sessionSecret\":\"${{ secrets.EXPO_TOKEN }}\"}}" > ~/.expo/state.json
+          cat ~/.expo/state.json # Output for debugging
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build Android APK
         run: |
+          # Run the cloud build without --output
           eas build --platform android --profile preview --non-interactive
-          # Move the output APK to a predictable location
-          mv *.apk ./android-release.apk || echo "No APK found, check EAS build output"
         env:
           REACT_APP_GITHUB_REPO: ${{ github.repository }}
+
+      - name: Download Android APK
+        run: |
+          # Download the latest APK from the EAS build
+          eas build:download --platform android --profile preview --path ./android-release.apk
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
@@ -128,16 +141,28 @@ jobs:
 
       - name: Setup EAS Authentication
         run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "Error: EXPO_TOKEN is not set or is empty"
+            exit 1
+          fi
           mkdir -p ~/.expo
-          echo '{"auth":{"sessionSecret":"${{ secrets.EXPO_TOKEN }}"}}' > ~/.expo/state.json
+          echo "{\"auth\":{\"sessionSecret\":\"${{ secrets.EXPO_TOKEN }}\"}}" > ~/.expo/state.json
+          cat ~/.expo/state.json # Output for debugging
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build iOS IPA
         run: |
           eas build --platform ios --profile preview --non-interactive
-          # Move the output IPA to a predictable location
-          mv *.ipa ./ios-release.ipa || echo "No IPA found, check EAS build output"
         env:
           REACT_APP_GITHUB_REPO: ${{ github.repository }}
+
+      - name: Download iOS IPA
+        run: |
+          # Download the latest IPA from the EAS build
+          eas build:download --platform ios --profile preview --path ./ios-release.ipa
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Upload iOS IPA
         uses: actions/upload-artifact@v4
