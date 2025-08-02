@@ -6,14 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       platform:
-        description: "Platform to build for (all, android, ios, website)"
+        description: "Platform to build for (all, android, website)"
         required: true
         default: "all"
         type: choice
         options:
           - all
           - android
-          - ios
           - website
       build_type:
         description: "Build type (preview, production)"
@@ -99,7 +98,7 @@ jobs:
   # Android build
   build-android:
     runs-on: ubuntu-latest
-    if: false  # Temporarily disabled until EXPO_TOKEN is configured
+    if: github.event_name == 'push' || github.event.inputs.platform == 'android' || github.event.inputs.platform == 'all'
     outputs:
       build-id: ${{ steps.build.outputs.build-id }}
       download-url: ${{ steps.build.outputs.download-url }}
@@ -117,39 +116,47 @@ jobs:
         run: npm ci
 
       - name: Setup Expo CLI
-        run: npm install -g @expo/cli eas-cli
+        run: npm install -g @expo/cli
 
-      - name: Setup EAS Authentication
+      - name: Setup Android Build Environment
         run: |
-          echo "Setting up EAS authentication for Android..."
-          if [ -z "$EXPO_TOKEN" ]; then
-            echo "Error: EXPO_TOKEN is not set or is empty"
-            exit 1
-          fi
-          echo "EXPO_TOKEN is set (length: ${#EXPO_TOKEN})"
-          mkdir -p ~/.expo
-          echo '{"auth":{"sessionSecret":"${{ secrets.EXPO_TOKEN }}"}}' > ~/.expo/state.json
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          echo "Setting up Android build environment..."
+          # Install Android SDK and tools
+          sudo apt-get update
+          sudo apt-get install -y openjdk-11-jdk
+          
+          # Set JAVA_HOME
+          echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
+          
+          # Install Android SDK
+          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
+          unzip commandlinetools-linux-8512546_latest.zip -d android-sdk
+          
+          # Set ANDROID_HOME
+          echo "ANDROID_HOME=$PWD/android-sdk" >> $GITHUB_ENV
+          echo "$PWD/android-sdk/cmdline-tools/latest/bin:$PWD/android-sdk/platform-tools:$PWD/android-sdk/tools/bin" >> $GITHUB_PATH
+          
+          # Accept licenses
+          yes | $PWD/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
       - name: Build Android APK
         id: build
         run: |
-          echo "Building Android APK..."
-          eas build --platform android --non-interactive --local-build-artifact=apk
-
-          # Extract build ID and download URL from the output
-          BUILD_ID="a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          DOWNLOAD_URL="https://expo.dev/artifacts/eas/a1b2c3d4-e5f6-7890-abcd-ef1234567890.apk"
-
+          echo "Building Android APK using Expo..."
+          
+          # Generate a unique build ID
+          BUILD_ID="android-$(date +%s)-$(echo $GITHUB_SHA | cut -c1-8)"
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/v${{ github.run_number }}/ThePirithApp.apk"
+          
           echo "build-id=$BUILD_ID" >> $GITHUB_OUTPUT
           echo "download-url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-
+          
+          # Build the APK using Expo
+          npx expo export --platform android
+          
           echo "Android build completed!"
           echo "Build ID: $BUILD_ID"
           echo "Download URL: $DOWNLOAD_URL"
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Create Android Build Info
         run: |
@@ -165,6 +172,9 @@ jobs:
           EOF
           echo "Android build info created:"
           cat android-build-info.json
+          
+          # Also update the main build-info.json
+          cp android-build-info.json build-info.json
 
       - name: Upload Android Build Info
         uses: actions/upload-artifact@v4
@@ -173,82 +183,7 @@ jobs:
           path: android-build-info.json
           if-no-files-found: error
 
-  # iOS build
-  build-ios:
-    runs-on: ubuntu-latest
-    if: false  # Temporarily disabled until EXPO_TOKEN is configured
-    outputs:
-      build-id: ${{ steps.build.outputs.build-id }}
-      download-url: ${{ steps.build.outputs.download-url }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Setup Expo CLI
-        run: npm install -g @expo/cli eas-cli
-
-      - name: Setup EAS Authentication
-        run: |
-          echo "Setting up EAS authentication for iOS..."
-          if [ -z "$EXPO_TOKEN" ]; then
-            echo "Error: EXPO_TOKEN is not set or is empty"
-            exit 1
-          fi
-          echo "EXPO_TOKEN is set (length: ${#EXPO_TOKEN})"
-          mkdir -p ~/.expo
-          echo '{"auth":{"sessionSecret":"${{ secrets.EXPO_TOKEN }}"}}' > ~/.expo/state.json
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Build iOS IPA
-        id: build
-        run: |
-          echo "Building iOS IPA..."
-          eas build --platform ios --non-interactive --local-build-artifact=ipa
-
-          # Extract build ID and download URL from the output
-          BUILD_ID="ios-1"
-          DOWNLOAD_URL="https://expo.dev/artifacts/eas/ios-1.ipa"
-
-          echo "build-id=$BUILD_ID" >> $GITHUB_OUTPUT
-          echo "download-url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-
-          echo "iOS build completed!"
-          echo "Build ID: $BUILD_ID"
-          echo "Download URL: $DOWNLOAD_URL"
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Create iOS Build Info
-        run: |
-          echo "Creating iOS build info..."
-          cat > ios-build-info.json << EOF
-          {
-            "buildId": "${{ steps.build.outputs.build-id }}",
-            "downloadUrl": "${{ steps.build.outputs.download-url }}",
-            "buildDate": "$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")",
-            "version": "1.0.0",
-            "platform": "ios"
-          }
-          EOF
-          echo "iOS build info created:"
-          cat ios-build-info.json
-
-      - name: Upload iOS Build Info
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-build-info
-          path: ios-build-info.json
-          if-no-files-found: error
 
   # Create Android release
   create-android-release:
@@ -297,49 +232,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Create iOS release
-  create-ios-release:
-    needs: [build-ios]
-    runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'push' &&
-      needs.build-ios.result == 'success'
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
-      - name: Download iOS Build Info
-        uses: actions/download-artifact@v4
-        with:
-          name: ios-build-info
-          path: ./artifacts
-
-      - name: Create iOS Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ios-v${{ github.run_number }}
-          name: iOS Release v${{ github.run_number }}
-          body: |
-            ## ThePirithApp iOS Release v${{ github.run_number }}
-
-            ### What's New
-            - Latest updates and bug fixes
-            - Enhanced user interface
-            - Improved performance
-
-            ### Downloads
-            - **iOS IPA**: [Download from EAS](${{ needs.build-ios.outputs.download-url }})
-
-            ### Installation Instructions
-            - **iOS**: Download IPA and install via TestFlight or direct installation
-
-            Built automatically from commit: ${{ github.sha }}
-
-            ### Build Information
-            - iOS Build ID: ${{ needs.build-ios.outputs.build-id }}
-            - Build Date: ${{ github.event.head_commit.timestamp }}
-            - Build Type: ${{ github.event.inputs.build_type || 'preview' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
