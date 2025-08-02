@@ -97,9 +97,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.welcomeSection}>
-          <Text style={styles.welcomeTitle}>
-            ධම්ම දාන වෙත සාදරයෙන් පිළිගනිමු
-          </Text>
+          <Text style={styles.welcomeTitle}>ධම්ම දාන 🙏</Text>
           <Text style={styles.welcomeText}>
             බුදුදහමේ පූජනීය ඉගැන්වීම් සහ පිළිවෙත් ගවේෂණය කරමු
           </Text>
@@ -122,7 +120,9 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>සබ්බදානං ධම්මදානං ජිනාති</Text>
-          <Text style={styles.footerSubtext}>🙏</Text>
+          <Text style={styles.footerText}>
+            © 2025 Akindu Kodithuwakku. Licensed under the MIT License.
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -200,15 +200,15 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: "center",
-    paddingVertical: 40,
-    paddingHorizontal: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
   },
   footerText: {
     fontSize: 16,
     color: Colors.textSecondary,
     textAlign: "center",
     marginBottom: 10,
-    opacity: 0.8,
+    opacity: 0.8
   },
   footerSubtext: {
     fontSize: 24,
