@@ -99,7 +99,7 @@ jobs:
   # Android build
   build-android:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event.inputs.platform == 'android' || github.event.inputs.platform == 'all'
+    if: false  # Temporarily disabled until EXPO_TOKEN is configured
     outputs:
       build-id: ${{ steps.build.outputs.build-id }}
       download-url: ${{ steps.build.outputs.download-url }}
@@ -129,6 +129,8 @@ jobs:
           echo "EXPO_TOKEN is set (length: ${#EXPO_TOKEN})"
           mkdir -p ~/.expo
           echo '{"auth":{"sessionSecret":"${{ secrets.EXPO_TOKEN }}"}}' > ~/.expo/state.json
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build Android APK
         id: build
@@ -146,6 +148,8 @@ jobs:
           echo "Android build completed!"
           echo "Build ID: $BUILD_ID"
           echo "Download URL: $DOWNLOAD_URL"
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Create Android Build Info
         run: |
@@ -172,7 +176,7 @@ jobs:
   # iOS build
   build-ios:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'all'
+    if: false  # Temporarily disabled until EXPO_TOKEN is configured
     outputs:
       build-id: ${{ steps.build.outputs.build-id }}
       download-url: ${{ steps.build.outputs.download-url }}
@@ -202,6 +206,8 @@ jobs:
           echo "EXPO_TOKEN is set (length: ${#EXPO_TOKEN})"
           mkdir -p ~/.expo
           echo '{"auth":{"sessionSecret":"${{ secrets.EXPO_TOKEN }}"}}' > ~/.expo/state.json
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build iOS IPA
         id: build
@@ -219,6 +225,8 @@ jobs:
           echo "iOS build completed!"
           echo "Build ID: $BUILD_ID"
           echo "Download URL: $DOWNLOAD_URL"
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Create iOS Build Info
         run: |
