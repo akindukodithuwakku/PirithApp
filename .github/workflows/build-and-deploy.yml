@@ -70,14 +70,22 @@ jobs:
           echo "EAS authentication configured successfully"
           echo "~/.expo/state.json contents:"
           cat ~/.expo/state.json
+          
+          # Verify authentication by checking who we are
+          echo "Verifying authentication..."
+          eas whoami
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Verify EAS Configuration
         run: |
           echo "Verifying EAS configuration..."
-          eas build:configure --platform android --profile ${{ github.event.inputs.build_type || 'preview' }} --non-interactive
+          eas build:configure
           echo "EAS configuration verified successfully"
+          
+          # Check project configuration
+          echo "Checking project configuration..."
+          eas project:info
 
       - name: Build Android APK
         id: build
@@ -161,14 +169,22 @@ jobs:
           echo "EAS authentication configured successfully"
           echo "~/.expo/state.json contents:"
           cat ~/.expo/state.json
+          
+          # Verify authentication by checking who we are
+          echo "Verifying authentication..."
+          eas whoami
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Verify EAS Configuration
         run: |
           echo "Verifying EAS configuration..."
-          eas build:configure --platform ios --profile ${{ github.event.inputs.build_type || 'preview' }} --non-interactive
+          eas build:configure
           echo "EAS configuration verified successfully"
+          
+          # Check project configuration
+          echo "Checking project configuration..."
+          eas project:info
 
       - name: Build iOS IPA
         id: build
