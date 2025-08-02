@@ -14,7 +14,6 @@
         "credentialsSource": "remote"
       },
       "ios": {
-        "buildType": "archive",
         "credentialsSource": "remote"
       }
     },
@@ -24,7 +23,6 @@
         "credentialsSource": "remote"
       },
       "ios": {
-        "buildType": "archive",
         "credentialsSource": "remote"
       }
     }

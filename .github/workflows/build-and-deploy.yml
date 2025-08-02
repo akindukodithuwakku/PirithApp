@@ -59,15 +59,25 @@ jobs:
 
       - name: Setup EAS Authentication
         run: |
+          echo "Setting up EAS authentication for Android..."
           if [ -z "$EXPO_TOKEN" ]; then
             echo "Error: EXPO_TOKEN is not set or is empty"
             exit 1
           fi
+          echo "EXPO_TOKEN is set (length: ${#EXPO_TOKEN})"
           mkdir -p ~/.expo
           echo '{"auth":{"sessionSecret":"${{ secrets.EXPO_TOKEN }}"}}' > ~/.expo/state.json
           echo "EAS authentication configured successfully"
+          echo "~/.expo/state.json contents:"
+          cat ~/.expo/state.json
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Verify EAS Configuration
+        run: |
+          echo "Verifying EAS configuration..."
+          eas build:configure --platform android --profile ${{ github.event.inputs.build_type || 'preview' }} --non-interactive
+          echo "EAS configuration verified successfully"
 
       - name: Build Android APK
         id: build
@@ -140,15 +150,25 @@ jobs:
 
       - name: Setup EAS Authentication
         run: |
+          echo "Setting up EAS authentication for iOS..."
           if [ -z "$EXPO_TOKEN" ]; then
             echo "Error: EXPO_TOKEN is not set or is empty"
             exit 1
           fi
+          echo "EXPO_TOKEN is set (length: ${#EXPO_TOKEN})"
           mkdir -p ~/.expo
           echo '{"auth":{"sessionSecret":"${{ secrets.EXPO_TOKEN }}"}}' > ~/.expo/state.json
           echo "EAS authentication configured successfully"
+          echo "~/.expo/state.json contents:"
+          cat ~/.expo/state.json
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Verify EAS Configuration
+        run: |
+          echo "Verifying EAS configuration..."
+          eas build:configure --platform ios --profile ${{ github.event.inputs.build_type || 'preview' }} --non-interactive
+          echo "EAS configuration verified successfully"
 
       - name: Build iOS IPA
         id: build
