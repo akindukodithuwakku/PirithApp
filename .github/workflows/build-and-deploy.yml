@@ -124,18 +124,18 @@ jobs:
           # Install Android SDK and tools
           sudo apt-get update
           sudo apt-get install -y openjdk-11-jdk
-          
+
           # Set JAVA_HOME
           echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
-          
+
           # Install Android SDK
           wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
           unzip commandlinetools-linux-8512546_latest.zip -d android-sdk
-          
+
           # Set ANDROID_HOME
           echo "ANDROID_HOME=$PWD/android-sdk" >> $GITHUB_ENV
           echo "$PWD/android-sdk/cmdline-tools/latest/bin:$PWD/android-sdk/platform-tools:$PWD/android-sdk/tools/bin" >> $GITHUB_PATH
-          
+
           # Accept licenses
           yes | $PWD/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
 
@@ -143,17 +143,17 @@ jobs:
         id: build
         run: |
           echo "Building Android APK using Expo..."
-          
+
           # Generate a unique build ID
           BUILD_ID="android-$(date +%s)-$(echo $GITHUB_SHA | cut -c1-8)"
           DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/v${{ github.run_number }}/ThePirithApp.apk"
-          
+
           echo "build-id=$BUILD_ID" >> $GITHUB_OUTPUT
           echo "download-url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-          
+
           # Build the APK using Expo
           npx expo export --platform android
-          
+
           echo "Android build completed!"
           echo "Build ID: $BUILD_ID"
           echo "Download URL: $DOWNLOAD_URL"
@@ -172,7 +172,7 @@ jobs:
           EOF
           echo "Android build info created:"
           cat android-build-info.json
-          
+
           # Also update the main build-info.json
           cp android-build-info.json build-info.json
 
@@ -182,8 +182,6 @@ jobs:
           name: android-build-info
           path: android-build-info.json
           if-no-files-found: error
-
-
 
   # Create Android release
   create-android-release:
@@ -231,5 +229,3 @@ jobs:
             - Build Type: ${{ github.event.inputs.build_type || 'preview' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
