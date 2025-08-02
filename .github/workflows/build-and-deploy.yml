@@ -100,14 +100,28 @@ jobs:
         id: check-builds
         run: |
           # Check if there's a recent successful build (within last 2 hours)
-          RECENT_BUILD=$(eas build:list --platform android --status finished --limit 1 --json | jq -r '.[0] | select(.createdAt > (now - 7200 | strftime("%Y-%m-%dT%H:%M:%S.000Z"))) | .id')
-          if [ -n "$RECENT_BUILD" ]; then
-            echo "Recent build found: $RECENT_BUILD"
-            echo "skip_build=true" >> $GITHUB_OUTPUT
-            echo "build_id=$RECENT_BUILD" >> $GITHUB_OUTPUT
-          else
-            echo "No recent build found, will create new build"
+          echo "Checking for recent builds..."
+          
+          # Get build list and handle potential errors
+          BUILD_LIST=$(eas build:list --platform android --status finished --limit 1 --json 2>/dev/null || echo "[]")
+          
+          if [ "$BUILD_LIST" = "[]" ] || [ -z "$BUILD_LIST" ]; then
+            echo "No builds found, will create new build"
             echo "skip_build=false" >> $GITHUB_OUTPUT
+          else
+            # Try to extract build ID and creation time
+            BUILD_ID=$(echo "$BUILD_LIST" | jq -r '.[0].id // empty' 2>/dev/null || echo "")
+            CREATED_AT=$(echo "$BUILD_LIST" | jq -r '.[0].createdAt // empty' 2>/dev/null || echo "")
+            
+            if [ -n "$BUILD_ID" ] && [ -n "$CREATED_AT" ]; then
+              echo "Found build: $BUILD_ID created at $CREATED_AT"
+              echo "Using existing build"
+              echo "skip_build=true" >> $GITHUB_OUTPUT
+              echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+            else
+              echo "Could not parse build information, will create new build"
+              echo "skip_build=false" >> $GITHUB_OUTPUT
+            fi
           fi
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -123,14 +137,23 @@ jobs:
 
       - name: Download Android APK
         run: |
-          # Use the build ID from the check step or get the latest
-          if [ "${{ steps.check-builds.outputs.skip_build }}" = "true" ]; then
-            BUILD_ID="${{ steps.check-builds.outputs.build_id }}"
-            echo "Using existing build ID: $BUILD_ID"
-          else
-            BUILD_ID=$(eas build:list --platform android --status finished --limit 1 --json | jq -r '.[0].id')
-            echo "Using new build ID: $BUILD_ID"
+          # Get the latest build ID for download
+          echo "Getting latest build for download..."
+          BUILD_LIST=$(eas build:list --platform android --status finished --limit 1 --json 2>/dev/null || echo "[]")
+          
+          if [ "$BUILD_LIST" = "[]" ] || [ -z "$BUILD_LIST" ]; then
+            echo "Error: No builds found to download"
+            exit 1
           fi
+          
+          BUILD_ID=$(echo "$BUILD_LIST" | jq -r '.[0].id // empty' 2>/dev/null || echo "")
+          
+          if [ -z "$BUILD_ID" ]; then
+            echo "Error: Could not extract build ID"
+            exit 1
+          fi
+          
+          echo "Downloading build: $BUILD_ID"
           eas build:download $BUILD_ID --path ./android-release.apk
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
