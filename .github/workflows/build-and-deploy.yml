@@ -135,37 +135,66 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           REACT_APP_GITHUB_REPO: ${{ github.repository }}
 
-      - name: Download Android APK
+      - name: Get Build Download Link
+        id: get-build-link
         run: |
-          # Get the latest build ID for download
-          echo "Getting latest build for download..."
+          # Get the latest build and extract download link
+          echo "Getting latest build download link..."
           BUILD_LIST=$(eas build:list --platform android --status finished --limit 1 --json 2>/dev/null || echo "[]")
           
           if [ "$BUILD_LIST" = "[]" ] || [ -z "$BUILD_LIST" ]; then
-            echo "Error: No builds found to download"
+            echo "Error: No builds found"
             exit 1
           fi
           
           BUILD_ID=$(echo "$BUILD_LIST" | jq -r '.[0].id // empty' 2>/dev/null || echo "")
+          DOWNLOAD_URL=$(echo "$BUILD_LIST" | jq -r '.[0].artifacts.buildUrl // empty' 2>/dev/null || echo "")
           
           if [ -z "$BUILD_ID" ]; then
             echo "Error: Could not extract build ID"
             exit 1
           fi
           
-          echo "Downloading build: $BUILD_ID"
-          eas build:download $BUILD_ID --path ./android-release.apk
+          if [ -z "$DOWNLOAD_URL" ]; then
+            echo "Error: Could not extract download URL"
+            exit 1
+          fi
+          
+          echo "Build ID: $BUILD_ID"
+          echo "Download URL: $DOWNLOAD_URL"
+          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Upload Android APK
+      - name: Create Build Info File
+        run: |
+          # Create a JSON file with build information for the website
+          cat > build-info.json << EOF
+          {
+            "buildId": "${{ steps.get-build-link.outputs.build_id }}",
+            "downloadUrl": "${{ steps.get-build-link.outputs.download_url }}",
+            "buildDate": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "version": "${{ github.run_number }}"
+          }
+          EOF
+          echo "Created build-info.json:"
+          cat build-info.json
+
+      - name: Upload Build Info
         uses: actions/upload-artifact@v4
         with:
-          name: android-apk
-          path: ./android-release.apk
+          name: build-info
+          path: build-info.json
           if-no-files-found: error
 
-  # Create release with Android build
+      - name: Copy Build Info to Website
+        run: |
+          # Copy build info to website public folder for access
+          cp build-info.json website/public/
+          echo "Copied build-info.json to website/public/"
+
+  # Create release with build info
   create-release:
     needs: [build-android]
     runs-on: ubuntu-latest
@@ -176,10 +205,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download Android APK
+      - name: Download Build Info
         uses: actions/download-artifact@v4
         with:
-          name: android-apk
+          name: build-info
           path: ./artifacts
 
       - name: Create Release
@@ -194,13 +223,15 @@ jobs:
             - Latest updates and bug fixes
 
             ### Downloads
-            - **Android APK**: Direct installation for Android devices
+            - **Android APK**: [Download from EAS](https://expo.dev/artifacts/eas/${{ needs.build-android.outputs.build_id }}.apk)
 
             ### Installation Instructions
             - **Android**: Download APK and enable "Install from unknown sources"
 
             Built automatically from commit: ${{ github.sha }}
-          files: |
-            ./artifacts/*.apk
+            
+            ### Build Information
+            - Build ID: ${{ needs.build-android.outputs.build_id }}
+            - Build Date: ${{ needs.build-android.outputs.build_date }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

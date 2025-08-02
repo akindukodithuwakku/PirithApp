@@ -11,16 +11,34 @@ import {
 
 function App() {
   const [latestRelease, setLatestRelease] = useState(null);
+  const [buildInfo, setBuildInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchLatestRelease();
+    fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      
+      // Fetch both GitHub release and build info
+      await Promise.all([
+        fetchLatestRelease(),
+        fetchBuildInfo()
+      ]);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError("Failed to fetch information. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchLatestRelease = async () => {
     try {
-      setError(null);
       const repo =
         process.env.REACT_APP_GITHUB_REPO || "akindukodithuwakku/PirithApp";
       const response = await fetch(
@@ -31,9 +49,6 @@ function App() {
         if (response.status === 404) {
           // No releases found - this is expected for new repositories
           setLatestRelease(null);
-          setError(
-            "No releases available yet. The app is still in development."
-          );
         } else {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -43,9 +58,21 @@ function App() {
       }
     } catch (error) {
       console.error("Error fetching latest release:", error);
-      setError("Failed to fetch release information. Please try again later.");
-    } finally {
-      setLoading(false);
+      // Don't set error here, just log it
+    }
+  };
+
+  const fetchBuildInfo = async () => {
+    try {
+      // Try to fetch build info from the website's public folder
+      const response = await fetch('/build-info.json');
+      if (response.ok) {
+        const data = await response.json();
+        setBuildInfo(data);
+      }
+    } catch (error) {
+      console.error("Error fetching build info:", error);
+      // Don't set error here, just log it
     }
   };
 
@@ -149,7 +176,7 @@ function App() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-buddhist-500 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading latest release...</p>
             </div>
-          ) : error ? (
+          ) : error && !buildInfo ? (
             <div className="bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto">
               <div className="text-center">
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
@@ -236,18 +263,30 @@ function App() {
                     devices
                   </p>
 
-                  {downloadAssets
-                    .filter((asset) => asset.name.includes(".apk"))
-                    .map((asset, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleDownload(asset)}
-                        className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
-                      >
-                        <CloudArrowDownIcon className="w-5 h-5 mr-2" />
-                        Download APK ({Math.round(asset.size / 1024 / 1024)}MB)
-                      </button>
-                    ))}
+                  {/* Show EAS build link if available */}
+                  {buildInfo && buildInfo.downloadUrl ? (
+                    <button
+                      onClick={() => window.open(buildInfo.downloadUrl, '_blank')}
+                      className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
+                    >
+                      <CloudArrowDownIcon className="w-5 h-5 mr-2" />
+                      Download APK v{buildInfo.version}
+                    </button>
+                  ) : (
+                    // Fallback to GitHub releases
+                    downloadAssets
+                      .filter((asset) => asset.name.includes(".apk"))
+                      .map((asset, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleDownload(asset)}
+                          className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
+                        >
+                          <CloudArrowDownIcon className="w-5 h-5 mr-2" />
+                          Download APK ({Math.round(asset.size / 1024 / 1024)}MB)
+                        </button>
+                      ))
+                  )}
                 </div>
 
                 {/* iOS Download */}
