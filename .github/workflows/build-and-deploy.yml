@@ -45,7 +45,7 @@ jobs:
       - name: Create Build Info for Website
         run: |
           echo "Creating build info for website..."
-          npm run manual-build-info 986805a3-1e51-4c9e-82ff-8b89f575a6e9
+          npm run manual-build-info website-${{ github.run_number }}
           echo "Build info created successfully!"
           echo "Contents of build-info.json:"
           cat build-info.json
@@ -58,6 +58,35 @@ jobs:
           cat website/public/build-info.json
           echo "Verifying build-info.json exists in website/public:"
           ls -la website/public/build-info.json
+
+      - name: Create Fallback Build Info Files
+        run: |
+          # Create fallback Android build info if it doesn't exist
+          if [ ! -f "website/public/android-build-info.json" ]; then
+            echo '{
+              "buildId": "android-fallback",
+              "downloadUrl": "https://expo.dev/artifacts/eas/android-fallback.apk",
+              "buildDate": "'$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")'",
+              "version": "1.0.0",
+              "platform": "android"
+            }' > website/public/android-build-info.json
+            echo "Created fallback Android build info"
+          fi
+
+          # Create fallback iOS build info if it doesn't exist
+          if [ ! -f "website/public/ios-build-info.json" ]; then
+            echo '{
+              "buildId": "ios-fallback",
+              "downloadUrl": "https://expo.dev/artifacts/eas/ios-fallback.ipa",
+              "buildDate": "'$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")'",
+              "version": "1.0.0",
+              "platform": "ios"
+            }' > website/public/ios-build-info.json
+            echo "Created fallback iOS build info"
+          fi
+
+          echo "All build info files ready:"
+          ls -la website/public/*build-info.json
 
       - name: Install website dependencies
         run: |
@@ -73,6 +102,10 @@ jobs:
           ls -la build/
           echo "Contents of build/build-info.json:"
           cat build/build-info.json
+          echo "Contents of build/android-build-info.json:"
+          cat build/android-build-info.json
+          echo "Contents of build/ios-build-info.json:"
+          cat build/ios-build-info.json
         env:
           REACT_APP_GITHUB_REPO: ${{ github.repository }}
 

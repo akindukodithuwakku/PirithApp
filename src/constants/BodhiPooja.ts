@@ -14,16 +14,16 @@ export interface BodhiPoojaData {
 export const BODHI_POOJA_DATA: Record<string, BodhiPoojaData> = {
   buddhaAndBodhiPali: {
     key: "buddhaAndBodhiPali",
-    title: "බුද්ධ වන්දනාව හා බෝධි වන්දනාව",
-    subtext: "පාලි භාෂාවෙන් පමණි",
+    title: "බෝධි පූජාව පාලියෙන්",
+    subtext: "බුද්ධ හා බෝධි පූජාව",
     pali: BuddhaAndBodhiPali,
     icon: "🙏",
     category: "protection",
   },
   buddhaAndBodhiSinhala: {
     key: "buddhaAndBodhiSinhala",
-    title: "බුද්ධ වන්දනාව හා බෝධි වන්දනාව",
-    subtext: "සිංහල අරුත් පමණි",
+    title: "බෝධි පූජාව සිංහලෙන්",
+    subtext: "බුද්ධ හා බෝධි පූජාව",
     pali: "", // Empty for Sinhala screen
     sinhala: BuddhaAndBodhi,
     icon: "🙏",

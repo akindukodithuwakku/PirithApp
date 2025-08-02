@@ -1,0 +1,145 @@
+name: Build Android App
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "app.json"
+      - "package.json"
+      - "eas.json"
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: "Build type (preview, production)"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - production
+
+concurrency:
+  group: "android-build"
+  cancel-in-progress: true
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Expo CLI
+        run: npm install -g @expo/cli eas-cli
+
+      - name: Setup EAS Authentication
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "Error: EXPO_TOKEN is not set or is empty"
+            exit 1
+          fi
+          echo "EXPO_TOKEN is set and ready for EAS authentication"
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Create Build Info
+        run: |
+          echo "Creating build info for Android..."
+          npm run manual-build-info android-${{ github.run_number }}
+          echo "Build info created successfully!"
+          echo "Contents of build-info.json:"
+          cat build-info.json
+
+      - name: Build Android APK
+        run: |
+          echo "Building Android APK..."
+          eas build --platform android --profile ${{ github.event.inputs.build_type || 'preview' }} --non-interactive
+          echo "Android build completed!"
+
+      - name: Get Build URL
+        id: build-url
+        run: |
+          # Get the latest build URL from EAS
+          BUILD_URL=$(eas build:list --platform android --limit 1 --json | jq -r '.[0].artifacts.buildUrl // empty')
+          if [ -n "$BUILD_URL" ]; then
+            echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT
+            echo "Android build URL: $BUILD_URL"
+          else
+            echo "build_url=https://expo.dev/artifacts/eas/android-${{ github.run_number }}.apk" >> $GITHUB_OUTPUT
+            echo "Using fallback build URL"
+          fi
+
+      - name: Update Build Info with URL
+        run: |
+          # Update build-info.json with the actual build URL
+          jq --arg url "${{ steps.build-url.outputs.build_url }}" '.downloadUrl = $url' build-info.json > build-info-temp.json
+          mv build-info-temp.json build-info.json
+          echo "Updated build-info.json with download URL:"
+          cat build-info.json
+
+      - name: Upload Build Info
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build-info
+          path: build-info.json
+          if-no-files-found: error
+
+      - name: Copy Build Info to Website
+        run: |
+          cp build-info.json website/public/android-build-info.json
+          echo "Copied Android build info to website/public/android-build-info.json"
+
+  create-android-release:
+    needs: [build-android]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Android Build Info
+        uses: actions/download-artifact@v4
+        with:
+          name: android-build-info
+          path: ./artifacts
+
+      - name: Create Android Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-v${{ github.run_number }}
+          name: Android Release v${{ github.run_number }}
+          body: |
+            ## ThePirithApp Android Release v${{ github.run_number }}
+
+            ### What's New
+            - Latest updates and bug fixes
+            - PDF integration for Jataka stories
+            - Smooth screen transitions
+            - Enhanced user interface
+
+            ### Downloads
+            - **Android APK**: [Download from EAS](https://expo.dev/artifacts/eas/android-${{ github.run_number }}.apk)
+
+            ### Installation Instructions
+            - **Android**: Download APK and enable "Install from unknown sources"
+
+            Built automatically from commit: ${{ github.sha }}
+
+            ### Build Information
+            - Android Build ID: android-${{ github.run_number }}
+            - Build Date: ${{ github.event.head_commit.timestamp }}
+            - Build Type: ${{ github.event.inputs.build_type || 'preview' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

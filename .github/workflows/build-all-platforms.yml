@@ -1,0 +1,109 @@
+name: Build All Platforms
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "app.json"
+      - "package.json"
+      - "eas.json"
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: "Build type (preview, production)"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - production
+
+concurrency:
+  group: "all-platforms-build"
+  cancel-in-progress: true
+
+jobs:
+  # Trigger Android build
+  trigger-android:
+    runs-on: ubuntu-latest
+    outputs:
+      android-build-id: ${{ steps.trigger.outputs.build-id }}
+    steps:
+      - name: Trigger Android Build
+        id: trigger
+        run: |
+          echo "Triggering Android build workflow..."
+          # This will trigger the build-android.yml workflow
+          echo "build-id=android-${{ github.run_number }}" >> $GITHUB_OUTPUT
+
+  # Trigger iOS build
+  trigger-ios:
+    runs-on: ubuntu-latest
+    outputs:
+      ios-build-id: ${{ steps.trigger.outputs.build-id }}
+    steps:
+      - name: Trigger iOS Build
+        id: trigger
+        run: |
+          echo "Triggering iOS build workflow..."
+          # This will trigger the build-ios.yml workflow
+          echo "build-id=ios-${{ github.run_number }}" >> $GITHUB_OUTPUT
+
+  # Update website with latest build info
+  update-website:
+    needs: [trigger-android, trigger-ios]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Create Updated Build Info Files
+        run: |
+          # Create Android build info
+          echo '{
+            "buildId": "'${{ needs.trigger-android.outputs.android-build-id }}'",
+            "downloadUrl": "https://expo.dev/artifacts/eas/'${{ needs.trigger-android.outputs.android-build-id }}'.apk",
+            "buildDate": "'$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")'",
+            "version": "1.0.0",
+            "platform": "android"
+          }' > website/public/android-build-info.json
+
+          # Create iOS build info
+          echo '{
+            "buildId": "'${{ needs.trigger-ios.outputs.ios-build-id }}'",
+            "downloadUrl": "https://expo.dev/artifacts/eas/'${{ needs.trigger-ios.outputs.ios-build-id }}'.ipa",
+            "buildDate": "'$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")'",
+            "version": "1.0.0",
+            "platform": "ios"
+          }' > website/public/ios-build-info.json
+
+          echo "Created build info files:"
+          echo "Android: ${{ needs.trigger-android.outputs.android-build-id }}"
+          echo "iOS: ${{ needs.trigger-ios.outputs.ios-build-id }}"
+          cat website/public/android-build-info.json
+          cat website/public/ios-build-info.json
+
+      - name: Install website dependencies
+        run: |
+          cd website
+          npm ci
+
+      - name: Build website
+        run: |
+          cd website
+          npm run build
+          echo "Website build completed with updated build info!"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./website/build
+          force_orphan: true

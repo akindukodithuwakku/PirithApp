@@ -9,7 +9,8 @@ import {
 } from "@heroicons/react/24/outline";
 
 function App() {
-  const [buildInfo, setBuildInfo] = useState(null);
+  const [androidBuildInfo, setAndroidBuildInfo] = useState(null);
+  const [iosBuildInfo, setIosBuildInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,38 +19,63 @@ function App() {
 
   const fetchBuildInfo = async () => {
     try {
-      const response = await fetch("/build-info.json");
-      if (response.ok) {
-        const data = await response.json();
-        setBuildInfo(data);
-        console.log("Build info loaded:", data);
+      // Fetch Android build info
+      const androidResponse = await fetch("/android-build-info.json");
+      if (androidResponse.ok) {
+        const androidData = await androidResponse.json();
+        setAndroidBuildInfo(androidData);
+        console.log("Android build info loaded:", androidData);
       } else {
-        console.log("No build info found, using fallback");
-        // Fallback build info
-        setBuildInfo({
-          buildId: "986805a3-1e51-4c9e-82ff-8b89f575a6e9",
-          downloadUrl:
-            "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
+        console.log("No Android build info found, using fallback");
+        setAndroidBuildInfo({
+          buildId: "android-1",
+          downloadUrl: "https://expo.dev/artifacts/eas/android-1.apk",
           buildDate: new Date().toISOString(),
           version: "1.0.0",
+          platform: "android",
+        });
+      }
+
+      // Fetch iOS build info
+      const iosResponse = await fetch("/ios-build-info.json");
+      if (iosResponse.ok) {
+        const iosData = await iosResponse.json();
+        setIosBuildInfo(iosData);
+        console.log("iOS build info loaded:", iosData);
+      } else {
+        console.log("No iOS build info found, using fallback");
+        setIosBuildInfo({
+          buildId: "ios-1",
+          downloadUrl: "https://expo.dev/artifacts/eas/ios-1.ipa",
+          buildDate: new Date().toISOString(),
+          version: "1.0.0",
+          platform: "ios",
         });
       }
     } catch (error) {
       console.error("Error fetching build info:", error);
       // Fallback build info
-      setBuildInfo({
-        buildId: "986805a3-1e51-4c9e-82ff-8b89f575a6e9",
-        downloadUrl:
-          "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
+      setAndroidBuildInfo({
+        buildId: "android-1",
+        downloadUrl: "https://expo.dev/artifacts/eas/android-1.apk",
         buildDate: new Date().toISOString(),
         version: "1.0.0",
+        platform: "android",
+      });
+      setIosBuildInfo({
+        buildId: "ios-1",
+        downloadUrl: "https://expo.dev/artifacts/eas/ios-1.ipa",
+        buildDate: new Date().toISOString(),
+        version: "1.0.0",
+        platform: "ios",
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = (platform) => {
+    const buildInfo = platform === "android" ? androidBuildInfo : iosBuildInfo;
     if (buildInfo && buildInfo.downloadUrl) {
       window.open(buildInfo.downloadUrl, "_blank");
     }
@@ -106,7 +132,7 @@ function App() {
               Download ThePirithApp
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Download the latest version of ThePirithApp for Android
+              Download the latest version of ThePirithApp for your platform
             </p>
           </div>
 
@@ -117,71 +143,120 @@ function App() {
                 Loading download information...
               </p>
             </div>
-          ) : buildInfo ? (
-            <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl mx-auto">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                  Latest Version Available
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Version {buildInfo.version} • Built on{" "}
-                  {new Date(buildInfo.buildDate).toLocaleDateString()}
-                </p>
-              </div>
-
-              {/* Android Download - PROMINENT */}
-              <div className="border-2 border-buddhist-200 rounded-xl p-6 bg-buddhist-50">
-                <div className="flex items-center mb-4">
-                  <DevicePhoneMobileIcon className="w-8 h-8 text-green-500 mr-3" />
-                  <h4 className="text-xl font-semibold text-gray-800">
-                    Android APK
-                  </h4>
-                </div>
-                <p className="text-gray-600 mb-6">
-                  Download the APK file for direct installation on Android
-                  devices
-                </p>
-
-                <button
-                  onClick={handleDownload}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-lg flex items-center justify-center transition-colors text-lg"
-                >
-                  <CloudArrowDownIcon className="w-6 h-6 mr-3" />
-                  Download APK v{buildInfo.version}
-                </button>
-
-                <div className="mt-4 text-sm text-gray-500 text-center">
-                  Build ID: {buildInfo.buildId}
-                </div>
-              </div>
-
-              {/* Installation Instructions */}
-              <div className="mt-8 p-6 bg-gray-50 rounded-xl">
-                <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
-                  <InformationCircleIcon className="w-5 h-5 mr-2" />
-                  Installation Instructions
-                </h4>
-                <div className="text-sm text-gray-600 space-y-2">
-                  <p>
-                    <strong>Android:</strong>
-                  </p>
-                  <ul className="list-disc list-inside space-y-1 ml-4">
-                    <li>Download the APK file above</li>
-                    <li>
-                      Enable "Install from unknown sources" in your device
-                      settings
-                    </li>
-                    <li>Open the downloaded APK file</li>
-                    <li>Follow the installation prompts</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
           ) : (
-            <div className="text-center">
-              <p className="text-gray-600">
-                Download information not available at the moment.
-              </p>
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {/* Android Download */}
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                    Android Version
+                  </h3>
+                  {androidBuildInfo && (
+                    <p className="text-gray-600 mb-4">
+                      Version {androidBuildInfo.version} • Built on{" "}
+                      {new Date(
+                        androidBuildInfo.buildDate
+                      ).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+
+                <div className="border-2 border-green-200 rounded-xl p-6 bg-green-50">
+                  <div className="flex items-center mb-4">
+                    <DevicePhoneMobileIcon className="w-8 h-8 text-green-500 mr-3" />
+                    <h4 className="text-xl font-semibold text-gray-800">
+                      Android APK
+                    </h4>
+                  </div>
+                  <p className="text-gray-600 mb-6">
+                    Download the APK file for direct installation on Android
+                    devices
+                  </p>
+
+                  <button
+                    onClick={() => handleDownload("android")}
+                    className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-lg flex items-center justify-center transition-colors text-lg"
+                  >
+                    <CloudArrowDownIcon className="w-6 h-6 mr-3" />
+                    Download APK v{androidBuildInfo?.version || "1.0.0"}
+                  </button>
+
+                  {androidBuildInfo && (
+                    <div className="mt-4 text-sm text-gray-500 text-center">
+                      Build ID: {androidBuildInfo.buildId}
+                    </div>
+                  )}
+                </div>
+
+                {/* Android Installation Instructions */}
+                <div className="mt-6 p-4 bg-gray-50 rounded-xl">
+                  <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
+                    <InformationCircleIcon className="w-5 h-5 mr-2" />
+                    Android Installation
+                  </h4>
+                  <div className="text-sm text-gray-600 space-y-1">
+                    <p>• Download the APK file</p>
+                    <p>• Enable "Install from unknown sources"</p>
+                    <p>• Open the downloaded APK file</p>
+                    <p>• Follow the installation prompts</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* iOS Download */}
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                    iOS Version
+                  </h3>
+                  {iosBuildInfo && (
+                    <p className="text-gray-600 mb-4">
+                      Version {iosBuildInfo.version} • Built on{" "}
+                      {new Date(iosBuildInfo.buildDate).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
+
+                <div className="border-2 border-blue-200 rounded-xl p-6 bg-blue-50">
+                  <div className="flex items-center mb-4">
+                    <DevicePhoneMobileIcon className="w-8 h-8 text-blue-500 mr-3" />
+                    <h4 className="text-xl font-semibold text-gray-800">
+                      iOS IPA
+                    </h4>
+                  </div>
+                  <p className="text-gray-600 mb-6">
+                    Download the IPA file for installation on iOS devices
+                  </p>
+
+                  <button
+                    onClick={() => handleDownload("ios")}
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-lg flex items-center justify-center transition-colors text-lg"
+                  >
+                    <CloudArrowDownIcon className="w-6 h-6 mr-3" />
+                    Download IPA v{iosBuildInfo?.version || "1.0.0"}
+                  </button>
+
+                  {iosBuildInfo && (
+                    <div className="mt-4 text-sm text-gray-500 text-center">
+                      Build ID: {iosBuildInfo.buildId}
+                    </div>
+                  )}
+                </div>
+
+                {/* iOS Installation Instructions */}
+                <div className="mt-6 p-4 bg-gray-50 rounded-xl">
+                  <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
+                    <InformationCircleIcon className="w-5 h-5 mr-2" />
+                    iOS Installation
+                  </h4>
+                  <div className="text-sm text-gray-600 space-y-1">
+                    <p>• Download the IPA file</p>
+                    <p>• Install via TestFlight (recommended)</p>
+                    <p>• Or use direct installation method</p>
+                    <p>• Trust the developer certificate</p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </section>
