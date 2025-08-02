@@ -1,7 +1,7 @@
 {
-  "buildId": "android-1",
-  "downloadUrl": "https://expo.dev/artifacts/eas/android-1.apk",
-  "buildDate": "2024-12-19T10:00:00.000Z",
-  "version": "1.0.0",
+  "buildId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "downloadUrl": "https://expo.dev/artifacts/eas/a1b2c3d4-e5f6-7890-abcd-ef1234567890.apk",
+  "buildDate": "2025-01-27T12:00:00.000Z",
+  "version": "1.0.1",
   "platform": "android"
 }
