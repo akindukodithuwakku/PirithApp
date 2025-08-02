@@ -1,0 +1,138 @@
+name: Build Mobile Apps
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Platform to build for"
+        required: true
+        default: "android"
+        type: choice
+        options:
+          - android
+          - ios
+
+concurrency:
+  group: "mobile-build"
+  cancel-in-progress: true
+
+jobs:
+  # Android build
+build-android:
+  runs-on: ubuntu-latest
+  if: github.event_name == 'push' || github.event.inputs.platform == 'android' || github.event.inputs.platform == 'all'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "18"
+        cache: "npm"
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Setup Expo CLI
+      run: npm install -g @expo/cli eas-cli
+
+    - name: Setup EAS Authentication
+      run: |
+        if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+          echo "Error: EXPO_TOKEN is not set or is empty"
+          exit 1
+        fi
+        mkdir -p ~/.expo
+        echo "{\"auth\":{\"sessionSecret\":\"${{ secrets.EXPO_TOKEN }}\"}}" > ~/.expo/state.json
+        cat ~/.expo/state.json # Output for debugging
+      env:
+        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+    - name: Build Android APK
+      run: |
+        eas build --platform android --profile preview --non-interactive
+      env:
+        REACT_APP_GITHUB_REPO: ${{ github.repository }}
+
+    - name: Download Android APK
+      run: |
+        eas build:download --platform android --profile preview --path ./android-release.apk
+      env:
+        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+    - name: Upload Android APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-apk
+        path: ./android-release.apk
+        if-no-files-found: error
+  build-ios:
+    runs-on: macos-latest
+    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.platform == 'ios') || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup Expo CLI
+        run: npm install -g @expo/cli eas-cli
+
+      - name: Setup EAS Authentication
+        run: |
+          mkdir -p ~/.expo
+          echo '{"auth":{"sessionSecret":"${{ secrets.EXPO_TOKEN }}"}}' > ~/.expo/state.json
+
+      - name: Build iOS
+        run: |
+          eas build --platform ios --profile preview --non-interactive
+
+  create-release:
+    needs: [build-android, build-ios]
+    runs-on: ubuntu-latest
+    if: always() && (needs.build-android.result == 'success' || needs.build-ios.result == 'success')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: ./artifacts
+        if: needs.build-android.result == 'success'
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
+          body: |
+            ## ThePirithApp Release v${{ github.run_number }}
+
+            ### What's New
+            - Latest updates and bug fixes
+
+            ### Downloads
+            - **Android APK**: Direct installation for Android devices
+            - **iOS IPA**: For iOS devices (requires sideloading)
+
+            ### Installation Instructions
+            - **Android**: Download APK and enable "Install from unknown sources"
+            - **iOS**: Requires developer account or TestFlight
+
+            Built automatically from commit: ${{ github.sha }}
+          files: |
+            ./artifacts/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

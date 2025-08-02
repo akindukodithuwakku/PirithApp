@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/PirithApp/static/css/main.13cb9bce.css",
+    "main.js": "/PirithApp/static/js/main.b2834cf5.js",
+    "index.html": "/PirithApp/index.html",
+    "main.13cb9bce.css.map": "/PirithApp/static/css/main.13cb9bce.css.map",
+    "main.b2834cf5.js.map": "/PirithApp/static/js/main.b2834cf5.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.13cb9bce.css",
+    "static/js/main.b2834cf5.js"
+  ]
+}
