@@ -45,7 +45,7 @@ jobs:
       - name: Create Build Info for Website
         run: |
           echo "Creating build info for website..."
-          npm run manual-build-info 986805a3-1e51-4c9e-82ff-8b89f575a6e9
+          npm run manual-build-info a1b2c3d4-e5f6-7890-abcd-ef1234567890
           echo "Build info created successfully!"
           echo "Contents of build-info.json:"
           cat build-info.json
@@ -156,7 +156,7 @@ jobs:
             - Latest updates and bug fixes
 
             ### Downloads
-            - **Android APK**: [Download from EAS](https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk)
+            - **Android APK**: [Download from EAS](https://expo.dev/artifacts/eas/a1b2c3d4-e5f6-7890-abcd-ef1234567890.apk)
 
             ### Installation Instructions
             - **Android**: Download APK and enable "Install from unknown sources"
@@ -164,7 +164,7 @@ jobs:
             Built automatically from commit: ${{ github.sha }}
 
             ### Build Information
-            - Android Build ID: 986805a3-1e51-4c9e-82ff-8b89f575a6e9
+            - Android Build ID: a1b2c3d4-e5f6-7890-abcd-ef1234567890
             - Build Date: ${{ github.event.head_commit.timestamp }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

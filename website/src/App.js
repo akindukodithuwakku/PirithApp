@@ -27,22 +27,22 @@ function App() {
         console.log("No build info found, using fallback");
         // Fallback build info
         setBuildInfo({
-          buildId: "986805a3-1e51-4c9e-82ff-8b89f575a6e9",
+          buildId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
           downloadUrl:
-            "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
+            "https://expo.dev/artifacts/eas/a1b2c3d4-e5f6-7890-abcd-ef1234567890.apk",
           buildDate: new Date().toISOString(),
-          version: "1.0.0",
+          version: "1.0.1",
         });
       }
     } catch (error) {
       console.error("Error fetching build info:", error);
       // Fallback build info
       setBuildInfo({
-        buildId: "986805a3-1e51-4c9e-82ff-8b89f575a6e9",
+        buildId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
         downloadUrl:
-          "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
+          "https://expo.dev/artifacts/eas/a1b2c3d4-e5f6-7890-abcd-ef1234567890.apk",
         buildDate: new Date().toISOString(),
-        version: "1.0.0",
+        version: "1.0.1",
       });
     } finally {
       setLoading(false);
