@@ -22,10 +22,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      
+      "bundleIdentifier": "com.akindu2002.thepirithapp",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.akindu2002.thepirithapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
