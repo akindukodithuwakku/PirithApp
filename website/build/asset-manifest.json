@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/PirithApp/static/css/main.13cb9bce.css",
-    "main.js": "/PirithApp/static/js/main.b2834cf5.js",
+    "main.css": "/PirithApp/static/css/main.2a22008d.css",
+    "main.js": "/PirithApp/static/js/main.693d2c75.js",
     "index.html": "/PirithApp/index.html",
-    "main.13cb9bce.css.map": "/PirithApp/static/css/main.13cb9bce.css.map",
-    "main.b2834cf5.js.map": "/PirithApp/static/js/main.b2834cf5.js.map"
+    "main.2a22008d.css.map": "/PirithApp/static/css/main.2a22008d.css.map",
+    "main.693d2c75.js.map": "/PirithApp/static/js/main.693d2c75.js.map"
   },
   "entrypoints": [
-    "static/css/main.13cb9bce.css",
-    "static/js/main.b2834cf5.js"
+    "static/css/main.2a22008d.css",
+    "static/js/main.693d2c75.js"
   ]
 }

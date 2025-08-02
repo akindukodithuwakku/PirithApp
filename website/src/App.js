@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   DevicePhoneMobileIcon,
-  ComputerDesktopIcon,
   CloudArrowDownIcon,
   InformationCircleIcon,
   BookOpenIcon,
@@ -10,104 +9,60 @@ import {
 } from "@heroicons/react/24/outline";
 
 function App() {
-  const [latestRelease, setLatestRelease] = useState(null);
   const [buildInfo, setBuildInfo] = useState(null);
-  const [iosBuildInfo, setIosBuildInfo] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchData();
+    fetchBuildInfo();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const fetchData = async () => {
+  const fetchBuildInfo = async () => {
     try {
-      setError(null);
-      setLoading(true);
-
-      // Fetch both GitHub release and build info
-      await Promise.all([
-        fetchLatestRelease(),
-        fetchBuildInfo(),
-        fetchIosBuildInfo(),
-      ]);
+      const response = await fetch("/build-info.json");
+      if (response.ok) {
+        const data = await response.json();
+        setBuildInfo(data);
+        console.log("Build info loaded:", data);
+      } else {
+        console.log("No build info found, using fallback");
+        // Fallback build info
+        setBuildInfo({
+          buildId: "986805a3-1e51-4c9e-82ff-8b89f575a6e9",
+          downloadUrl: "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
+          buildDate: new Date().toISOString(),
+          version: "1.0.0"
+        });
+      }
     } catch (error) {
-      console.error("Error fetching data:", error);
-      setError("Failed to fetch information. Please try again later.");
+      console.error("Error fetching build info:", error);
+      // Fallback build info
+      setBuildInfo({
+        buildId: "986805a3-1e51-4c9e-82ff-8b89f575a6e9",
+        downloadUrl: "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
+        buildDate: new Date().toISOString(),
+        version: "1.0.0"
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchLatestRelease = async () => {
-    try {
-      const repo =
-        process.env.REACT_APP_GITHUB_REPO || "akindukodithuwakku/PirithApp";
-      const response = await fetch(
-        `https://api.github.com/repos/${repo}/releases/latest`
-      );
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          // No releases found - this is expected for new repositories
-          setLatestRelease(null);
-        } else {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-      } else {
-        const data = await response.json();
-        setLatestRelease(data);
-      }
-    } catch (error) {
-      console.error("Error fetching latest release:", error);
-      // Don't set error here, just log it
+  const handleDownload = () => {
+    if (buildInfo && buildInfo.downloadUrl) {
+      window.open(buildInfo.downloadUrl, "_blank");
     }
-  };
-
-  const fetchBuildInfo = async () => {
-    try {
-      // Try to fetch build info from the website's public folder
-      const response = await fetch("/build-info.json");
-      if (response.ok) {
-        const data = await response.json();
-        setBuildInfo(data);
-      }
-    } catch (error) {
-      console.error("Error fetching build info:", error);
-      // Don't set error here, just log it
-    }
-  };
-
-  const fetchIosBuildInfo = async () => {
-    try {
-      // Try to fetch iOS build info from the website's public folder
-      const response = await fetch("/ios-build-info.json");
-      if (response.ok) {
-        const data = await response.json();
-        setIosBuildInfo(data);
-      }
-    } catch (error) {
-      console.error("Error fetching iOS build info:", error);
-      // Don't set error here, just log it
-    }
-  };
-
-  const handleDownload = (asset) => {
-    window.open(asset.browser_download_url, "_blank");
   };
 
   const features = [
     {
       icon: BookOpenIcon,
       title: "Pirith Collection",
-      description:
-        "Complete collection of Buddhist Pirith chants in Pali and Sinhala languages",
+      description: "Complete collection of Buddhist Pirith chants in Pali and Sinhala languages",
     },
     {
       icon: HeartIcon,
       title: "Suthra Content",
-      description:
-        "Sacred Buddhist discourses and teachings for daily practice",
+      description: "Sacred Buddhist discourses and teachings for daily practice",
     },
     {
       icon: DevicePhoneMobileIcon,
@@ -121,8 +76,6 @@ function App() {
     },
   ];
 
-  const downloadAssets = latestRelease?.assets || [];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-buddhist-50 to-buddhist-100">
       {/* Header */}
@@ -133,8 +86,7 @@ function App() {
               ThePirithApp
             </h1>
             <p className="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto">
-              Your digital companion for Buddhist Pirith chants and Suthra
-              teachings
+              Your digital companion for Buddhist Pirith chants and Suthra teachings
             </p>
           </div>
         </div>
@@ -142,6 +94,82 @@ function App() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12">
+        {/* Download Section - PROMINENT */}
+        <section className="mb-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
+              Download ThePirithApp
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Download the latest version of ThePirithApp for Android
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-buddhist-500 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading download information...</p>
+            </div>
+          ) : buildInfo ? (
+            <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl mx-auto">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                  Latest Version Available
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Version {buildInfo.version} • Built on {new Date(buildInfo.buildDate).toLocaleDateString()}
+                </p>
+              </div>
+
+              {/* Android Download - PROMINENT */}
+              <div className="border-2 border-buddhist-200 rounded-xl p-6 bg-buddhist-50">
+                <div className="flex items-center mb-4">
+                  <DevicePhoneMobileIcon className="w-8 h-8 text-green-500 mr-3" />
+                  <h4 className="text-xl font-semibold text-gray-800">
+                    Android APK
+                  </h4>
+                </div>
+                <p className="text-gray-600 mb-6">
+                  Download the APK file for direct installation on Android devices
+                </p>
+
+                <button
+                  onClick={handleDownload}
+                  className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-lg flex items-center justify-center transition-colors text-lg"
+                >
+                  <CloudArrowDownIcon className="w-6 h-6 mr-3" />
+                  Download APK v{buildInfo.version}
+                </button>
+
+                <div className="mt-4 text-sm text-gray-500 text-center">
+                  Build ID: {buildInfo.buildId}
+                </div>
+              </div>
+
+              {/* Installation Instructions */}
+              <div className="mt-8 p-6 bg-gray-50 rounded-xl">
+                <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
+                  <InformationCircleIcon className="w-5 h-5 mr-2" />
+                  Installation Instructions
+                </h4>
+                <div className="text-sm text-gray-600 space-y-2">
+                  <p><strong>Android:</strong></p>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>Download the APK file above</li>
+                    <li>Enable "Install from unknown sources" in your device settings</li>
+                    <li>Open the downloaded APK file</li>
+                    <li>Follow the installation prompts</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <p className="text-gray-600">Download information not available at the moment.</p>
+            </div>
+          )}
+        </section>
+
         {/* About Section */}
         <section className="mb-16">
           <div className="text-center mb-12">
@@ -149,12 +177,9 @@ function App() {
               About ThePirithApp
             </h2>
             <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              ThePirithApp is a comprehensive mobile application designed to
-              bring the sacred Buddhist Pirith chants and Suthra teachings to
-              your fingertips. Whether you're a practicing Buddhist, a student
-              of Buddhist philosophy, or simply interested in these ancient
-              texts, our app provides easy access to these spiritual resources
-              in both Pali and Sinhala languages.
+              ThePirithApp is a comprehensive mobile application designed to bring the sacred Buddhist Pirith chants and Suthra teachings to your fingertips. 
+              Whether you're a practicing Buddhist, a student of Buddhist philosophy, or simply interested in these ancient texts, 
+              our app provides easy access to these spiritual resources in both Pali and Sinhala languages.
             </p>
           </div>
 
@@ -173,220 +198,6 @@ function App() {
               </div>
             ))}
           </div>
-        </section>
-
-        {/* Download Section */}
-        <section className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-              Download ThePirithApp
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Choose your platform and download the latest version of
-              ThePirithApp
-            </p>
-          </div>
-
-          {loading ? (
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-buddhist-500 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading latest release...</p>
-            </div>
-          ) : error && !buildInfo ? (
-            <div className="bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-                  <h3 className="text-xl font-semibold text-yellow-800 mb-2">
-                    Development in Progress
-                  </h3>
-                  <p className="text-yellow-700 mb-4">{error}</p>
-                  <p className="text-yellow-600 text-sm">
-                    The app is currently being developed and will be available
-                    for download soon.
-                  </p>
-                </div>
-
-                {/* Development Status */}
-                <div className="mt-8 grid md:grid-cols-2 gap-6">
-                  <div className="border-2 border-gray-200 rounded-xl p-6">
-                    <div className="flex items-center mb-4">
-                      <DevicePhoneMobileIcon className="w-8 h-8 text-green-500 mr-3" />
-                      <h4 className="text-xl font-semibold text-gray-800">
-                        Android
-                      </h4>
-                    </div>
-                    <p className="text-gray-600 mb-4">
-                      Android version coming soon
-                    </p>
-                    <div className="bg-gray-100 text-gray-500 font-semibold py-3 px-6 rounded-lg text-center">
-                      Coming Soon
-                    </div>
-                  </div>
-
-                  <div className="border-2 border-gray-200 rounded-xl p-6">
-                    <div className="flex items-center mb-4">
-                      <ComputerDesktopIcon className="w-8 h-8 text-blue-500 mr-3" />
-                      <h4 className="text-xl font-semibold text-gray-800">
-                        iOS
-                      </h4>
-                    </div>
-                    <p className="text-gray-600 mb-4">
-                      iOS version coming soon
-                    </p>
-                    <div className="bg-gray-100 text-gray-500 font-semibold py-3 px-6 rounded-lg text-center">
-                      Coming Soon
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : latestRelease ? (
-            <div className="bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                  Latest Release: {latestRelease.tag_name}
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Released on{" "}
-                  {new Date(latestRelease.published_at).toLocaleDateString()}
-                </p>
-                {latestRelease.body && (
-                  <div className="bg-buddhist-50 rounded-lg p-4 text-left">
-                    <h4 className="font-semibold text-gray-800 mb-2">
-                      What's New:
-                    </h4>
-                    <div
-                      className="text-gray-600 prose prose-sm max-w-none"
-                      dangerouslySetInnerHTML={{
-                        __html: latestRelease.body.replace(/\n/g, "<br/>"),
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Android Download */}
-                <div className="border-2 border-gray-200 rounded-xl p-6 hover:border-buddhist-300 transition-colors">
-                  <div className="flex items-center mb-4">
-                    <DevicePhoneMobileIcon className="w-8 h-8 text-green-500 mr-3" />
-                    <h4 className="text-xl font-semibold text-gray-800">
-                      Android
-                    </h4>
-                  </div>
-                  <p className="text-gray-600 mb-4">
-                    Download the APK file for direct installation on Android
-                    devices
-                  </p>
-
-                  {/* Show EAS build link if available */}
-                  {buildInfo && buildInfo.downloadUrl ? (
-                    <button
-                      onClick={() =>
-                        window.open(buildInfo.downloadUrl, "_blank")
-                      }
-                      className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
-                    >
-                      <CloudArrowDownIcon className="w-5 h-5 mr-2" />
-                      Download APK v{buildInfo.version}
-                    </button>
-                  ) : (
-                    // Fallback to GitHub releases
-                    downloadAssets
-                      .filter((asset) => asset.name.includes(".apk"))
-                      .map((asset, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleDownload(asset)}
-                          className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
-                        >
-                          <CloudArrowDownIcon className="w-5 h-5 mr-2" />
-                          Download APK ({Math.round(asset.size / 1024 / 1024)}
-                          MB)
-                        </button>
-                      ))
-                  )}
-                </div>
-
-                {/* iOS Download */}
-                <div className="border-2 border-gray-200 rounded-xl p-6 hover:border-buddhist-300 transition-colors">
-                  <div className="flex items-center mb-4">
-                    <ComputerDesktopIcon className="w-8 h-8 text-blue-500 mr-3" />
-                    <h4 className="text-xl font-semibold text-gray-800">iOS</h4>
-                  </div>
-                  <p className="text-gray-600 mb-4">
-                    Download the IPA file for iOS devices (requires sideloading)
-                  </p>
-
-                  {/* Show EAS build link if available */}
-                  {iosBuildInfo && iosBuildInfo.downloadUrl ? (
-                    <button
-                      onClick={() =>
-                        window.open(iosBuildInfo.downloadUrl, "_blank")
-                      }
-                      className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
-                    >
-                      <CloudArrowDownIcon className="w-5 h-5 mr-2" />
-                      Download IPA v{iosBuildInfo.version}
-                    </button>
-                  ) : (
-                    // Fallback to GitHub releases
-                    downloadAssets
-                      .filter((asset) => asset.name.includes(".ipa"))
-                      .map((asset, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleDownload(asset)}
-                          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
-                        >
-                          <CloudArrowDownIcon className="w-5 h-5 mr-2" />
-                          Download IPA ({Math.round(asset.size / 1024 / 1024)}
-                          MB)
-                        </button>
-                      ))
-                  )}
-                </div>
-              </div>
-
-              {/* Installation Instructions */}
-              <div className="mt-8 p-6 bg-gray-50 rounded-xl">
-                <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
-                  <InformationCircleIcon className="w-5 h-5 mr-2" />
-                  Installation Instructions
-                </h4>
-                <div className="grid md:grid-cols-2 gap-6 text-sm">
-                  <div>
-                    <h5 className="font-semibold text-gray-700 mb-2">
-                      Android:
-                    </h5>
-                    <ul className="text-gray-600 space-y-1">
-                      <li>• Download the APK file</li>
-                      <li>
-                        • Enable "Install from unknown sources" in settings
-                      </li>
-                      <li>
-                        • Open the APK file and follow installation prompts
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h5 className="font-semibold text-gray-700 mb-2">iOS:</h5>
-                    <ul className="text-gray-600 space-y-1">
-                      <li>• Requires a developer account or TestFlight</li>
-                      <li>• Use tools like AltStore or Sideloadly</li>
-                      <li>• Follow the specific sideloading instructions</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center">
-              <p className="text-gray-600">
-                No releases available at the moment.
-              </p>
-            </div>
-          )}
         </section>
 
         {/* Content Preview */}
@@ -451,8 +262,7 @@ function App() {
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-2xl font-bold mb-4">ThePirithApp</h3>
           <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-            Bringing the sacred Buddhist texts and teachings to the digital age,
-            making them accessible to everyone, everywhere.
+            Bringing the sacred Buddhist texts and teachings to the digital age, making them accessible to everyone, everywhere.
           </p>
           <div className="flex justify-center space-x-6">
             <a
