@@ -93,44 +93,11 @@ jobs:
             exit 1
           fi
           echo "EXPO_TOKEN is set and ready for EAS authentication"
-          # EAS CLI will automatically use EXPO_TOKEN environment variable
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Check for recent builds
-        id: check-builds
-        run: |
-          # Check if there's a recent successful build (within last 2 hours)
-          echo "Checking for recent builds..."
-          
-          # Get build list and handle potential errors
-          BUILD_LIST=$(eas build:list --platform android --status finished --limit 1 --json 2>/dev/null || echo "[]")
-          
-          if [ "$BUILD_LIST" = "[]" ] || [ -z "$BUILD_LIST" ]; then
-            echo "No builds found, will create new build"
-            echo "skip_build=false" >> $GITHUB_OUTPUT
-          else
-            # Try to extract build ID and creation time
-            BUILD_ID=$(echo "$BUILD_LIST" | jq -r '.[0].id // empty' 2>/dev/null || echo "")
-            CREATED_AT=$(echo "$BUILD_LIST" | jq -r '.[0].createdAt // empty' 2>/dev/null || echo "")
-            
-            if [ -n "$BUILD_ID" ] && [ -n "$CREATED_AT" ]; then
-              echo "Found build: $BUILD_ID created at $CREATED_AT"
-              echo "Using existing build"
-              echo "skip_build=true" >> $GITHUB_OUTPUT
-              echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
-            else
-              echo "Could not parse build information, will create new build"
-              echo "skip_build=false" >> $GITHUB_OUTPUT
-            fi
-          fi
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build Android APK
-        if: steps.check-builds.outputs.skip_build != 'true'
         run: |
-          # Run the cloud build without --output
           eas build --platform android --profile preview --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -139,8 +106,9 @@ jobs:
       - name: Get Build Download Link
         id: get-build-link
         run: |
-          # Get the latest build and extract download link
           echo "Getting latest build download link..."
+          sleep 10
+          
           BUILD_LIST=$(eas build:list --platform android --status finished --limit 1 --json 2>/dev/null || echo "[]")
           
           if [ "$BUILD_LIST" = "[]" ] || [ -z "$BUILD_LIST" ]; then
@@ -170,7 +138,6 @@ jobs:
 
       - name: Create Build Info File
         run: |
-          # Create a JSON file with build information for the website
           cat > build-info.json << EOF
           {
             "buildId": "${{ steps.get-build-link.outputs.build_id }}",
@@ -191,17 +158,8 @@ jobs:
 
       - name: Copy Build Info to Website
         run: |
-          # Copy build info to website public folder for access
           cp build-info.json website/public/
           echo "Copied build-info.json to website/public/"
-
-  # iOS build (commented out for now - will add after Android works)
-  # build-ios:
-  #   runs-on: ubuntu-latest
-  #   needs: [build-android]
-  #   if: |
-  #     (github.event_name == 'push' || github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'all') &&
-  #     needs.build-android.result == 'success'
 
   # Create release with build info
   create-release:
@@ -219,13 +177,6 @@ jobs:
         with:
           name: build-info
           path: ./artifacts
-
-      # iOS build info download (commented out for now)
-      # - name: Download iOS Build Info
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: ios-build-info
-      #     path: ./artifacts
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
