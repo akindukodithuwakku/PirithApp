@@ -15,7 +15,8 @@
     "build:cache:check": "node scripts/manage-build-cache.js check",
     "build:cache:stats": "node scripts/manage-build-cache.js stats",
     "build:cache:record": "node scripts/manage-build-cache.js record",
-    "build:cache:reset": "node scripts/manage-build-cache.js reset"
+    "build:cache:reset": "node scripts/manage-build-cache.js reset",
+    "fix-ports": "node scripts/fix-ports.js"
   },
   "dependencies": {
     "@react-navigation/native": "^7.1.14",
@@ -26,7 +27,10 @@
     "react-native": "0.79.5",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "~4.11.1"
+    "react-native-screens": "~4.11.1",
+    "expo-file-system": "~16.0.8",
+    "expo-sharing": "~13.1.4",
+    "expo-linking": "~6.2.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

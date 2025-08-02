@@ -7,6 +7,7 @@ export const ScreenNames = {
   BODHI_POOJA: "BodhiPooja",
   BODHI_POOJA_DETAIL: "BodhiPoojaDetail",
   JATHAKA_KATHA: "JathakaKatha",
+  JATHAKA_DETAIL: "JathakaDetail",
   REFERENCE: "Reference",
 } as const;
 

@@ -4,6 +4,7 @@ import { ScreenNames } from "../constants/ScreenNames";
 import { SuthraData } from "../constants/suthraData";
 import { PirithData } from "../constants/pirithData";
 import { BodhiPoojaData } from "../constants/BodhiPooja";
+import { JatakaData } from "../constants/jatakaData";
 
 export type RootStackParamList = {
   [ScreenNames.DASHBOARD]: undefined;
@@ -15,6 +16,7 @@ export type RootStackParamList = {
   [ScreenNames.SUTHRA_DETAIL]: { suthra: SuthraData };
   [ScreenNames.PIRITH_DETAIL]: { pirith: PirithData };
   [ScreenNames.BODHI_POOJA_DETAIL]: { bodhiPooja: BodhiPoojaData };
+  [ScreenNames.JATHAKA_DETAIL]: { jataka: JatakaData };
 };
 
 export type DashboardScreenNavigationProp = StackNavigationProp<

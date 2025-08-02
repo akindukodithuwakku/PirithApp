@@ -1,18 +1,16 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Colors } from "../constants/Colors";
 import { ScreenNames } from "../constants/ScreenNames";
-
-// Import screens
 import Dashboard from "../screens/Dashboard";
-import SuthraScreen from "../screens/SuthraScreen";
 import PirithScreen from "../screens/PirithScreen";
-import PirithDetailWrapper from "../screens/PirithDetailWrapper";
+import PirithDetailScreen from "../screens/PirithDetailScreen";
+import SuthraScreen from "../screens/SuthraScreen";
+import SuthraDetailScreen from "../screens/SuthraDetailScreen";
 import BodhiPoojaScreen from "../screens/BodhiPoojaScreen";
 import BodhiPoojaDetailScreen from "../screens/BodhiPoojaDetailScreen";
 import JathakaKathaScreen from "../screens/JathakaKathaScreen";
+import JatakaDetailScreen from "../screens/JatakaDetailScreen";
 import ReferenceScreen from "../screens/Refference";
-import SuthraDetailScreen from "../screens/SuthraDetailScreen";
 
 const Stack = createStackNavigator();
 
@@ -21,20 +19,7 @@ const AppNavigator: React.FC = () => {
     <Stack.Navigator
       initialRouteName={ScreenNames.DASHBOARD}
       screenOptions={{
-        headerStyle: {
-          backgroundColor: Colors.surface,
-          elevation: 0,
-          shadowOpacity: 0,
-        },
-        headerTintColor: Colors.text,
-        headerTitleStyle: {
-          fontWeight: "bold",
-          fontSize: 18,
-        },
-        cardStyle: {
-          backgroundColor: Colors.background,
-        },
-        // Smooth transition configurations
+        headerShown: false,
         transitionSpec: {
           open: {
             animation: "timing",
@@ -85,83 +70,34 @@ const AppNavigator: React.FC = () => {
         gestureVelocityImpact: 0.3,
       }}
     >
+      <Stack.Screen name={ScreenNames.DASHBOARD} component={Dashboard} />
+      <Stack.Screen name={ScreenNames.PIRITH} component={PirithScreen} />
       <Stack.Screen
-        name={ScreenNames.DASHBOARD}
-        component={Dashboard}
-        options={{
-          headerShown: false,
-        }}
+        name={ScreenNames.PIRITH_DETAIL}
+        component={PirithDetailScreen}
       />
+      <Stack.Screen name={ScreenNames.SUTHRA} component={SuthraScreen} />
       <Stack.Screen
-        name={ScreenNames.SUTHRA}
-        component={SuthraScreen}
-        options={{
-          title: "Suthra",
-          headerTitleAlign: "center",
-        }}
-      />
-      <Stack.Screen
-        name={ScreenNames.PIRITH}
-        component={PirithScreen}
-        options={{
-          title: "Pirith",
-          headerTitleAlign: "center",
-        }}
+        name={ScreenNames.SUTHRA_DETAIL}
+        component={SuthraDetailScreen}
       />
       <Stack.Screen
         name={ScreenNames.BODHI_POOJA}
         component={BodhiPoojaScreen}
-        options={{
-          title: "Bodhi Pooja",
-          headerTitleAlign: "center",
-        }}
-      />
-      <Stack.Screen
-        name={ScreenNames.JATHAKA_KATHA}
-        component={JathakaKathaScreen}
-        options={{
-          title: "Jathaka Katha",
-          headerTitleAlign: "center",
-        }}
-      />
-      <Stack.Screen
-        name={ScreenNames.REFERENCE}
-        component={ReferenceScreen}
-        options={{
-          title: "Reference",
-          headerTitleAlign: "center",
-        }}
-      />
-      <Stack.Screen
-        name="SuthraDetail"
-        component={SuthraDetailScreen}
-        options={{
-          title: "",
-          headerTitleAlign: "center",
-          headerTintColor: Colors.text,
-          headerStyle: { backgroundColor: Colors.surface },
-        }}
-      />
-      <Stack.Screen
-        name="PirithDetail"
-        component={PirithDetailWrapper}
-        options={{
-          title: "",
-          headerTitleAlign: "center",
-          headerTintColor: Colors.text,
-          headerStyle: { backgroundColor: Colors.surface },
-        }}
       />
       <Stack.Screen
         name={ScreenNames.BODHI_POOJA_DETAIL}
         component={BodhiPoojaDetailScreen}
-        options={{
-          title: "",
-          headerTitleAlign: "center",
-          headerTintColor: Colors.text,
-          headerStyle: { backgroundColor: Colors.surface },
-        }}
       />
+      <Stack.Screen
+        name={ScreenNames.JATHAKA_KATHA}
+        component={JathakaKathaScreen}
+      />
+      <Stack.Screen
+        name={ScreenNames.JATHAKA_DETAIL}
+        component={JatakaDetailScreen}
+      />
+      <Stack.Screen name={ScreenNames.REFERENCE} component={ReferenceScreen} />
     </Stack.Navigator>
   );
 };
