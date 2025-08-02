@@ -5,6 +5,7 @@ export const ScreenNames = {
   PIRITH: "Pirith",
   PIRITH_DETAIL: "PirithDetail",
   BODHI_POOJA: "BodhiPooja",
+  BODHI_POOJA_DETAIL: "BodhiPoojaDetail",
   JATHAKA_KATHA: "JathakaKatha",
   REFERENCE: "Reference",
 } as const;

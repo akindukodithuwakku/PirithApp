@@ -9,6 +9,7 @@ import SuthraScreen from "../screens/SuthraScreen";
 import PirithScreen from "../screens/PirithScreen";
 import PirithDetailWrapper from "../screens/PirithDetailWrapper";
 import BodhiPoojaScreen from "../screens/BodhiPoojaScreen";
+import BodhiPoojaDetailScreen from "../screens/BodhiPoojaDetailScreen";
 import JathakaKathaScreen from "../screens/JathakaKathaScreen";
 import ReferenceScreen from "../screens/Refference";
 import SuthraDetailScreen from "../screens/SuthraDetailScreen";
@@ -144,6 +145,16 @@ const AppNavigator: React.FC = () => {
       <Stack.Screen
         name="PirithDetail"
         component={PirithDetailWrapper}
+        options={{
+          title: "",
+          headerTitleAlign: "center",
+          headerTintColor: Colors.text,
+          headerStyle: { backgroundColor: Colors.surface },
+        }}
+      />
+      <Stack.Screen
+        name={ScreenNames.BODHI_POOJA_DETAIL}
+        component={BodhiPoojaDetailScreen}
         options={{
           title: "",
           headerTitleAlign: "center",
