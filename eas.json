@@ -12,11 +12,19 @@
       "android": {
         "buildType": "apk",
         "credentialsSource": "remote"
+      },
+      "ios": {
+        "buildType": "archive",
+        "credentialsSource": "remote"
       }
     },
     "production": {
       "android": {
         "buildType": "apk",
+        "credentialsSource": "remote"
+      },
+      "ios": {
+        "buildType": "archive",
         "credentialsSource": "remote"
       }
     }
