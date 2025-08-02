@@ -255,7 +255,7 @@ jobs:
       - name: Build iOS IPA
         if: steps.check-ios-builds.outputs.skip_build != 'true'
         run: |
-          eas build --platform ios --profile preview --non-interactive
+          eas build --platform ios --profile preview-ios --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           REACT_APP_GITHUB_REPO: ${{ github.repository }}

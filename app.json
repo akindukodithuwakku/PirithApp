@@ -36,9 +36,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "permissions": [
-        "INTERNET"
-      ]
+      "permissions": ["INTERNET"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
