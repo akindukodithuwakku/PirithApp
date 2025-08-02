@@ -119,6 +119,23 @@ jobs:
           path: ./android-release.apk
           if-no-files-found: error
 
+      - name: Upload APK to Firebase Storage
+        run: |
+          # Install Firebase CLI
+          npm install -g firebase-tools
+
+          # Login to Firebase using service account
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}' > firebase-service-account.json
+          firebase use ${{ secrets.FIREBASE_PROJECT_ID }}
+
+          # Upload APK to Firebase Storage
+          firebase storage:upload ./android-release.apk apks/ --project ${{ secrets.FIREBASE_PROJECT_ID }}
+
+          # Clean up
+          rm firebase-service-account.json
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
   # iOS build
   build-ios:
     runs-on: macos-latest

@@ -8,14 +8,18 @@ import {
   HeartIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
+import firebaseService from "./services/firebaseService";
 
 function App() {
   const [latestRelease, setLatestRelease] = useState(null);
+  const [latestAPK, setLatestAPK] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [apkLoading, setApkLoading] = useState(true);
 
   useEffect(() => {
     fetchLatestRelease();
+    fetchLatestAPK();
   }, []);
 
   const fetchLatestRelease = async () => {
@@ -49,8 +53,31 @@ function App() {
     }
   };
 
+  const fetchLatestAPK = async () => {
+    try {
+      setApkLoading(true);
+      const result = await firebaseService.getLatestAPK();
+
+      if (result.success) {
+        setLatestAPK(result.apk);
+      } else {
+        console.log("No APK available yet:", result.error);
+        setLatestAPK(null);
+      }
+    } catch (error) {
+      console.error("Error fetching latest APK:", error);
+      setLatestAPK(null);
+    } finally {
+      setApkLoading(false);
+    }
+  };
+
   const handleDownload = (asset) => {
     window.open(asset.browser_download_url, "_blank");
+  };
+
+  const handleAPKDownload = (apk) => {
+    window.open(apk.downloadURL, "_blank");
   };
 
   const features = [
@@ -235,18 +262,36 @@ function App() {
                     Download the APK file for direct installation on Android
                     devices
                   </p>
-                  {downloadAssets
-                    .filter((asset) => asset.name.includes(".apk"))
-                    .map((asset, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleDownload(asset)}
-                        className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
-                      >
-                        <CloudArrowDownIcon className="w-5 h-5 mr-2" />
-                        Download APK ({Math.round(asset.size / 1024 / 1024)}MB)
-                      </button>
-                    ))}
+
+                  {/* Firebase APK Download */}
+                  {apkLoading ? (
+                    <div className="w-full bg-gray-100 text-gray-500 font-semibold py-3 px-6 rounded-lg text-center">
+                      Loading APK...
+                    </div>
+                  ) : latestAPK ? (
+                    <button
+                      onClick={() => handleAPKDownload(latestAPK)}
+                      className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
+                    >
+                      <CloudArrowDownIcon className="w-5 h-5 mr-2" />
+                      Download APK v{latestAPK.version}
+                    </button>
+                  ) : (
+                    // Fallback to GitHub releases if no Firebase APK
+                    downloadAssets
+                      .filter((asset) => asset.name.includes(".apk"))
+                      .map((asset, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleDownload(asset)}
+                          className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
+                        >
+                          <CloudArrowDownIcon className="w-5 h-5 mr-2" />
+                          Download APK ({Math.round(asset.size / 1024 / 1024)}
+                          MB)
+                        </button>
+                      ))
+                  )}
                 </div>
 
                 {/* iOS Download */}
