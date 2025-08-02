@@ -56,6 +56,8 @@ jobs:
           echo "Copied build-info.json to website/public/"
           echo "Contents of website/public/build-info.json:"
           cat website/public/build-info.json
+          echo "Verifying build-info.json exists in website/public:"
+          ls -la website/public/build-info.json
 
       - name: Install website dependencies
         run: |
@@ -67,10 +69,10 @@ jobs:
           cd website
           npm run build
           echo "Website build completed!"
-          echo "Contents of website/build directory:"
-          ls -la website/build/
-          echo "Contents of website/build/build-info.json:"
-          cat website/build/build-info.json
+          echo "Contents of build directory:"
+          ls -la build/
+          echo "Contents of build/build-info.json:"
+          cat build/build-info.json
         env:
           REACT_APP_GITHUB_REPO: ${{ github.repository }}
 
@@ -80,7 +82,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./website/build"
+          path: "website/build"
 
       - name: Deploy to GitHub Pages
         id: deployment
