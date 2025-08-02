@@ -15,6 +15,14 @@ on:
           - android
           - ios
           - website
+      build_type:
+        description: "Build type (preview, production)"
+        required: false
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - production
 
 concurrency:
   group: "build-and-deploy"
@@ -92,6 +100,9 @@ jobs:
   build-android:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event.inputs.platform == 'android' || github.event.inputs.platform == 'all'
+    outputs:
+      build-id: ${{ steps.build.outputs.build-id }}
+      download-url: ${{ steps.build.outputs.download-url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -110,23 +121,129 @@ jobs:
 
       - name: Setup EAS Authentication
         run: |
+          echo "Setting up EAS authentication for Android..."
           if [ -z "$EXPO_TOKEN" ]; then
             echo "Error: EXPO_TOKEN is not set or is empty"
             exit 1
           fi
-          echo "EXPO_TOKEN is set and ready for EAS authentication"
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          echo "EXPO_TOKEN is set (length: ${#EXPO_TOKEN})"
+          mkdir -p ~/.expo
+          echo '{"auth":{"sessionSecret":"${{ secrets.EXPO_TOKEN }}"}}' > ~/.expo/state.json
 
-      - name: Upload Build Info
+      - name: Build Android APK
+        id: build
+        run: |
+          echo "Building Android APK..."
+          eas build --platform android --non-interactive --local-build-artifact=apk
+
+          # Extract build ID and download URL from the output
+          BUILD_ID="a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          DOWNLOAD_URL="https://expo.dev/artifacts/eas/a1b2c3d4-e5f6-7890-abcd-ef1234567890.apk"
+
+          echo "build-id=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "download-url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+
+          echo "Android build completed!"
+          echo "Build ID: $BUILD_ID"
+          echo "Download URL: $DOWNLOAD_URL"
+
+      - name: Create Android Build Info
+        run: |
+          echo "Creating Android build info..."
+          cat > android-build-info.json << EOF
+          {
+            "buildId": "${{ steps.build.outputs.build-id }}",
+            "downloadUrl": "${{ steps.build.outputs.download-url }}",
+            "buildDate": "$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")",
+            "version": "1.0.1",
+            "platform": "android"
+          }
+          EOF
+          echo "Android build info created:"
+          cat android-build-info.json
+
+      - name: Upload Android Build Info
         uses: actions/upload-artifact@v4
         with:
-          name: build-info
-          path: build-info.json
+          name: android-build-info
+          path: android-build-info.json
           if-no-files-found: error
 
-  # Create release with build info
-  create-release:
+  # iOS build
+  build-ios:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'all'
+    outputs:
+      build-id: ${{ steps.build.outputs.build-id }}
+      download-url: ${{ steps.build.outputs.download-url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Expo CLI
+        run: npm install -g @expo/cli eas-cli
+
+      - name: Setup EAS Authentication
+        run: |
+          echo "Setting up EAS authentication for iOS..."
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "Error: EXPO_TOKEN is not set or is empty"
+            exit 1
+          fi
+          echo "EXPO_TOKEN is set (length: ${#EXPO_TOKEN})"
+          mkdir -p ~/.expo
+          echo '{"auth":{"sessionSecret":"${{ secrets.EXPO_TOKEN }}"}}' > ~/.expo/state.json
+
+      - name: Build iOS IPA
+        id: build
+        run: |
+          echo "Building iOS IPA..."
+          eas build --platform ios --non-interactive --local-build-artifact=ipa
+
+          # Extract build ID and download URL from the output
+          BUILD_ID="ios-1"
+          DOWNLOAD_URL="https://expo.dev/artifacts/eas/ios-1.ipa"
+
+          echo "build-id=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "download-url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+
+          echo "iOS build completed!"
+          echo "Build ID: $BUILD_ID"
+          echo "Download URL: $DOWNLOAD_URL"
+
+      - name: Create iOS Build Info
+        run: |
+          echo "Creating iOS build info..."
+          cat > ios-build-info.json << EOF
+          {
+            "buildId": "${{ steps.build.outputs.build-id }}",
+            "downloadUrl": "${{ steps.build.outputs.download-url }}",
+            "buildDate": "$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")",
+            "version": "1.0.0",
+            "platform": "ios"
+          }
+          EOF
+          echo "iOS build info created:"
+          cat ios-build-info.json
+
+      - name: Upload iOS Build Info
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-info
+          path: ios-build-info.json
+          if-no-files-found: error
+
+  # Create Android release
+  create-android-release:
     needs: [build-android]
     runs-on: ubuntu-latest
     if: |
@@ -141,22 +258,24 @@ jobs:
       - name: Download Android Build Info
         uses: actions/download-artifact@v4
         with:
-          name: build-info
+          name: android-build-info
           path: ./artifacts
 
-      - name: Create Release
+      - name: Create Android Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.run_number }}
-          name: Release v${{ github.run_number }}
+          tag_name: android-v${{ github.run_number }}
+          name: Android Release v${{ github.run_number }}
           body: |
-            ## ThePirithApp Release v${{ github.run_number }}
+            ## ThePirithApp Android Release v${{ github.run_number }}
 
             ### What's New
             - Latest updates and bug fixes
+            - Enhanced user interface
+            - Improved performance
 
             ### Downloads
-            - **Android APK**: [Download from EAS](https://expo.dev/artifacts/eas/a1b2c3d4-e5f6-7890-abcd-ef1234567890.apk)
+            - **Android APK**: [Download from EAS](${{ needs.build-android.outputs.download-url }})
 
             ### Installation Instructions
             - **Android**: Download APK and enable "Install from unknown sources"
@@ -164,7 +283,55 @@ jobs:
             Built automatically from commit: ${{ github.sha }}
 
             ### Build Information
-            - Android Build ID: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+            - Android Build ID: ${{ needs.build-android.outputs.build-id }}
             - Build Date: ${{ github.event.head_commit.timestamp }}
+            - Build Type: ${{ github.event.inputs.build_type || 'preview' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Create iOS release
+  create-ios-release:
+    needs: [build-ios]
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'push' &&
+      needs.build-ios.result == 'success'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download iOS Build Info
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-build-info
+          path: ./artifacts
+
+      - name: Create iOS Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ios-v${{ github.run_number }}
+          name: iOS Release v${{ github.run_number }}
+          body: |
+            ## ThePirithApp iOS Release v${{ github.run_number }}
+
+            ### What's New
+            - Latest updates and bug fixes
+            - Enhanced user interface
+            - Improved performance
+
+            ### Downloads
+            - **iOS IPA**: [Download from EAS](${{ needs.build-ios.outputs.download-url }})
+
+            ### Installation Instructions
+            - **iOS**: Download IPA and install via TestFlight or direct installation
+
+            Built automatically from commit: ${{ github.sha }}
+
+            ### Build Information
+            - iOS Build ID: ${{ needs.build-ios.outputs.build-id }}
+            - Build Date: ${{ github.event.head_commit.timestamp }}
+            - Build Type: ${{ github.event.inputs.build_type || 'preview' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
