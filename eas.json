@@ -14,22 +14,9 @@
         "credentialsSource": "remote"
       }
     },
-    "preview-ios": {
-      "distribution": "internal",
-      "ios": {
-        "buildType": "archive",
-        "credentialsSource": "remote"
-      }
-    },
     "production": {
       "android": {
         "buildType": "apk",
-        "credentialsSource": "remote"
-      }
-    },
-    "production-ios": {
-      "ios": {
-        "buildType": "archive",
         "credentialsSource": "remote"
       }
     }
