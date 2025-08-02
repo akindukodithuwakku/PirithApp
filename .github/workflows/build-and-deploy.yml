@@ -52,7 +52,7 @@ jobs:
       - name: Create Build Info for Website
         run: |
           echo "Creating build info for website..."
-          npm run manual-build-info a1b2c3d4-e5f6-7890-abcd-ef1234567890
+          npm run manual-build-info c1faef92-05b4-45ea-be90-58f434f377e0
           echo "Build info created successfully!"
           echo "Contents of build-info.json:"
           cat build-info.json
@@ -95,13 +95,13 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-  # Android build
+  # Android build info (using manual build ID)
   build-android:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event.inputs.platform == 'android' || github.event.inputs.platform == 'all'
     outputs:
-      build-id: ${{ steps.build.outputs.build-id }}
-      download-url: ${{ steps.build.outputs.download-url }}
+      build-id: ${{ steps.build-info.outputs.build-id }}
+      download-url: ${{ steps.build-info.outputs.download-url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -112,59 +112,29 @@ jobs:
           node-version: "18"
           cache: "npm"
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Setup Expo CLI
-        run: npm install -g @expo/cli
-
-      - name: Setup Android Build Environment
+      - name: Create Android Build Info
+        id: build-info
         run: |
-          echo "Setting up Android build environment..."
-          # Install Android SDK and tools
-          sudo apt-get update
-          sudo apt-get install -y openjdk-11-jdk
-
-          # Set JAVA_HOME
-          echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
-
-          # Install Android SDK
-          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip
-          unzip commandlinetools-linux-8512546_latest.zip -d android-sdk
-
-          # Set ANDROID_HOME
-          echo "ANDROID_HOME=$PWD/android-sdk" >> $GITHUB_ENV
-          echo "$PWD/android-sdk/cmdline-tools/latest/bin:$PWD/android-sdk/platform-tools:$PWD/android-sdk/tools/bin" >> $GITHUB_PATH
-
-          # Accept licenses
-          yes | $PWD/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses
-
-      - name: Build Android APK
-        id: build
-        run: |
-          echo "Building Android APK using Expo..."
-
-          # Generate a unique build ID
-          BUILD_ID="android-$(date +%s)-$(echo $GITHUB_SHA | cut -c1-8)"
-          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/v${{ github.run_number }}/ThePirithApp.apk"
-
+          echo "Creating Android build info with manual build ID..."
+          
+          # Use the manual build ID from Expo
+          BUILD_ID="c1faef92-05b4-45ea-be90-58f434f377e0"
+          DOWNLOAD_URL="https://expo.dev/artifacts/eas/c1faef92-05b4-45ea-be90-58f434f377e0.apk"
+          
           echo "build-id=$BUILD_ID" >> $GITHUB_OUTPUT
           echo "download-url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-
-          # Build the APK using Expo
-          npx expo export --platform android
-
-          echo "Android build completed!"
+          
+          echo "Android build info created!"
           echo "Build ID: $BUILD_ID"
           echo "Download URL: $DOWNLOAD_URL"
 
-      - name: Create Android Build Info
+      - name: Create Android Build Info Files
         run: |
-          echo "Creating Android build info..."
+          echo "Creating Android build info files..."
           cat > android-build-info.json << EOF
           {
-            "buildId": "${{ steps.build.outputs.build-id }}",
-            "downloadUrl": "${{ steps.build.outputs.download-url }}",
+            "buildId": "${{ steps.build-info.outputs.build-id }}",
+            "downloadUrl": "${{ steps.build-info.outputs.download-url }}",
             "buildDate": "$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")",
             "version": "1.0.1",
             "platform": "android"
