@@ -28,9 +28,10 @@ function App() {
         // Fallback build info
         setBuildInfo({
           buildId: "986805a3-1e51-4c9e-82ff-8b89f575a6e9",
-          downloadUrl: "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
+          downloadUrl:
+            "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
           buildDate: new Date().toISOString(),
-          version: "1.0.0"
+          version: "1.0.0",
         });
       }
     } catch (error) {
@@ -38,9 +39,10 @@ function App() {
       // Fallback build info
       setBuildInfo({
         buildId: "986805a3-1e51-4c9e-82ff-8b89f575a6e9",
-        downloadUrl: "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
+        downloadUrl:
+          "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
         buildDate: new Date().toISOString(),
-        version: "1.0.0"
+        version: "1.0.0",
       });
     } finally {
       setLoading(false);
@@ -57,12 +59,14 @@ function App() {
     {
       icon: BookOpenIcon,
       title: "Pirith Collection",
-      description: "Complete collection of Buddhist Pirith chants in Pali and Sinhala languages",
+      description:
+        "Complete collection of Buddhist Pirith chants in Pali and Sinhala languages",
     },
     {
       icon: HeartIcon,
       title: "Suthra Content",
-      description: "Sacred Buddhist discourses and teachings for daily practice",
+      description:
+        "Sacred Buddhist discourses and teachings for daily practice",
     },
     {
       icon: DevicePhoneMobileIcon,
@@ -86,7 +90,8 @@ function App() {
               ThePirithApp
             </h1>
             <p className="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto">
-              Your digital companion for Buddhist Pirith chants and Suthra teachings
+              Your digital companion for Buddhist Pirith chants and Suthra
+              teachings
             </p>
           </div>
         </div>
@@ -108,7 +113,9 @@ function App() {
           {loading ? (
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-buddhist-500 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading download information...</p>
+              <p className="mt-4 text-gray-600">
+                Loading download information...
+              </p>
             </div>
           ) : buildInfo ? (
             <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl mx-auto">
@@ -117,7 +124,8 @@ function App() {
                   Latest Version Available
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Version {buildInfo.version} • Built on {new Date(buildInfo.buildDate).toLocaleDateString()}
+                  Version {buildInfo.version} • Built on{" "}
+                  {new Date(buildInfo.buildDate).toLocaleDateString()}
                 </p>
               </div>
 
@@ -130,7 +138,8 @@ function App() {
                   </h4>
                 </div>
                 <p className="text-gray-600 mb-6">
-                  Download the APK file for direct installation on Android devices
+                  Download the APK file for direct installation on Android
+                  devices
                 </p>
 
                 <button
@@ -153,10 +162,15 @@ function App() {
                   Installation Instructions
                 </h4>
                 <div className="text-sm text-gray-600 space-y-2">
-                  <p><strong>Android:</strong></p>
+                  <p>
+                    <strong>Android:</strong>
+                  </p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     <li>Download the APK file above</li>
-                    <li>Enable "Install from unknown sources" in your device settings</li>
+                    <li>
+                      Enable "Install from unknown sources" in your device
+                      settings
+                    </li>
                     <li>Open the downloaded APK file</li>
                     <li>Follow the installation prompts</li>
                   </ul>
@@ -165,7 +179,9 @@ function App() {
             </div>
           ) : (
             <div className="text-center">
-              <p className="text-gray-600">Download information not available at the moment.</p>
+              <p className="text-gray-600">
+                Download information not available at the moment.
+              </p>
             </div>
           )}
         </section>
@@ -177,9 +193,12 @@ function App() {
               About ThePirithApp
             </h2>
             <p className="text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              ThePirithApp is a comprehensive mobile application designed to bring the sacred Buddhist Pirith chants and Suthra teachings to your fingertips. 
-              Whether you're a practicing Buddhist, a student of Buddhist philosophy, or simply interested in these ancient texts, 
-              our app provides easy access to these spiritual resources in both Pali and Sinhala languages.
+              ThePirithApp is a comprehensive mobile application designed to
+              bring the sacred Buddhist Pirith chants and Suthra teachings to
+              your fingertips. Whether you're a practicing Buddhist, a student
+              of Buddhist philosophy, or simply interested in these ancient
+              texts, our app provides easy access to these spiritual resources
+              in both Pali and Sinhala languages.
             </p>
           </div>
 
@@ -262,7 +281,8 @@ function App() {
         <div className="container mx-auto px-4 text-center">
           <h3 className="text-2xl font-bold mb-4">ThePirithApp</h3>
           <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-            Bringing the sacred Buddhist texts and teachings to the digital age, making them accessible to everyone, everywhere.
+            Bringing the sacred Buddhist texts and teachings to the digital age,
+            making them accessible to everyone, everywhere.
           </p>
           <div className="flex justify-center space-x-6">
             <a
