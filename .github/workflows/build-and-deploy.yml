@@ -42,6 +42,21 @@ jobs:
           node-version: "18"
           cache: "npm"
 
+      - name: Create Build Info for Website
+        run: |
+          echo "Creating build info for website..."
+          npm run manual-build-info 986805a3-1e51-4c9e-82ff-8b89f575a6e9
+          echo "Build info created successfully!"
+          echo "Contents of build-info.json:"
+          cat build-info.json
+
+      - name: Copy Build Info to Website Public
+        run: |
+          cp build-info.json website/public/
+          echo "Copied build-info.json to website/public/"
+          echo "Contents of website/public/build-info.json:"
+          cat website/public/build-info.json
+
       - name: Install website dependencies
         run: |
           cd website
@@ -51,6 +66,11 @@ jobs:
         run: |
           cd website
           npm run build
+          echo "Website build completed!"
+          echo "Contents of website/build directory:"
+          ls -la website/build/
+          echo "Contents of website/build/build-info.json:"
+          cat website/build/build-info.json
         env:
           REACT_APP_GITHUB_REPO: ${{ github.repository }}
 
@@ -96,23 +116,12 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Create Build Info (Use Existing Build)
-        run: |
-          echo "Using existing build ID: 986805a3-1e51-4c9e-82ff-8b89f575a6e9"
-          npm run manual-build-info 986805a3-1e51-4c9e-82ff-8b89f575a6e9
-          echo "Build info created successfully!"
-
       - name: Upload Build Info
         uses: actions/upload-artifact@v4
         with:
           name: build-info
           path: build-info.json
           if-no-files-found: error
-
-      - name: Copy Build Info to Website
-        run: |
-          cp build-info.json website/public/
-          echo "Copied build-info.json to website/public/"
 
   # Create release with build info
   create-release:
