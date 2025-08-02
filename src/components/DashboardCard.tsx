@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   TouchableOpacity,
   Text,
   StyleSheet,
   View,
   Dimensions,
+  Animated,
 } from "react-native";
 import { Colors } from "../constants/Colors";
 
@@ -15,6 +16,7 @@ interface DashboardCardProps {
   onPress: () => void;
   gradientColors?: string[];
   iconColor?: string;
+  index?: number;
 }
 
 const { width } = Dimensions.get("window");
@@ -26,29 +28,89 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   onPress,
   gradientColors = [Colors.card, Colors.surface],
   iconColor = Colors.secondary,
+  index = 0,
 }) => {
+  const [scaleValue] = useState(new Animated.Value(1));
+  const [fadeValue] = useState(new Animated.Value(0));
+  const [translateY] = useState(new Animated.Value(20));
+
+  useEffect(() => {
+    // Staggered animation for cards appearing
+    Animated.parallel([
+      Animated.timing(fadeValue, {
+        toValue: 1,
+        duration: 400,
+        delay: index * 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 400,
+        delay: index * 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeValue, translateY, index]);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleValue, {
+      toValue: 0.95,
+      useNativeDriver: true,
+      tension: 100,
+      friction: 8,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleValue, {
+      toValue: 1,
+      useNativeDriver: true,
+      tension: 100,
+      friction: 8,
+    }).start();
+  };
+
+  const handlePress = () => {
+    // Add a small delay to allow the press animation to complete
+    setTimeout(() => {
+      onPress();
+    }, 50);
+  };
+
   return (
-    <TouchableOpacity
-      style={[styles.card, { backgroundColor: gradientColors[0] }]}
-      onPress={onPress}
-      activeOpacity={0.8}
+    <Animated.View
+      style={{
+        transform: [{ scale: scaleValue }, { translateY: translateY }],
+        opacity: fadeValue,
+      }}
     >
-      <View style={styles.cardContent}>
-        <View
-          style={[styles.iconContainer, { backgroundColor: iconColor + "20" }]}
-        >
-          <Text style={[styles.icon, { color: iconColor }]}>{icon}</Text>
+      <TouchableOpacity
+        style={[styles.card, { backgroundColor: gradientColors[0] }]}
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        activeOpacity={1}
+      >
+        <View style={styles.cardContent}>
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: iconColor + "20" },
+            ]}
+          >
+            <Text style={[styles.icon, { color: iconColor }]}>{icon}</Text>
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.subtitle}>{subtitle}</Text>
+          </View>
+          <View style={styles.arrowContainer}>
+            <Text style={styles.arrow}>→</Text>
+          </View>
         </View>
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
-        </View>
-        <View style={styles.arrowContainer}>
-          <Text style={styles.arrow}>→</Text>
-        </View>
-      </View>
-      <View style={styles.glowEffect} />
-    </TouchableOpacity>
+        <View style={styles.glowEffect} />
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 

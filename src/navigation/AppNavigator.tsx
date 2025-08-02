@@ -33,6 +33,55 @@ const AppNavigator: React.FC = () => {
         cardStyle: {
           backgroundColor: Colors.background,
         },
+        // Smooth transition configurations
+        transitionSpec: {
+          open: {
+            animation: "timing",
+            config: {
+              duration: 300,
+              easing: (t: number) => {
+                return t * (2 - t); // Ease out cubic
+              },
+            },
+          },
+          close: {
+            animation: "timing",
+            config: {
+              duration: 250,
+              easing: (t: number) => {
+                return t * t * (3 - 2 * t); // Smoothstep
+              },
+            },
+          },
+        },
+        cardStyleInterpolator: ({ current, layouts }) => {
+          return {
+            cardStyle: {
+              transform: [
+                {
+                  translateX: current.progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [layouts.screen.width, 0],
+                  }),
+                },
+              ],
+              opacity: current.progress.interpolate({
+                inputRange: [0, 0.5, 1],
+                outputRange: [0, 0.5, 1],
+              }),
+            },
+            overlayStyle: {
+              opacity: current.progress.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 0.5],
+              }),
+            },
+          };
+        },
+        gestureEnabled: true,
+        gestureDirection: "horizontal",
+        gestureResponseDistance: 50,
+        gestureVelocityImpact: 0.3,
       }}
     >
       <Stack.Screen

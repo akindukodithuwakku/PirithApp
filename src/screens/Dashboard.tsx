@@ -104,7 +104,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
         </View>
 
         <View style={styles.cardsContainer}>
-          {dashboardItems.map((item) => (
+          {dashboardItems.map((item, index) => (
             <DashboardCard
               key={item.id}
               title={item.title}
@@ -113,6 +113,7 @@ const Dashboard: React.FC<DashboardProps> = ({ navigation }) => {
               onPress={() => handleNavigate(item.screen)}
               gradientColors={item.gradientColors}
               iconColor={item.iconColor}
+              index={index}
             />
           ))}
         </View>
@@ -208,7 +209,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: "center",
     marginBottom: 10,
-    opacity: 0.8
+    opacity: 0.8,
   },
   footerSubtext: {
     fontSize: 24,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Dimensions,
+  Animated,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -20,6 +21,84 @@ const PirithScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const pirithList = Object.values(PIRITH_DATA);
 
+  const PirithCard: React.FC<{ pirith: any; index: number }> = ({
+    pirith,
+    index,
+  }) => {
+    const [scaleValue] = useState(new Animated.Value(1));
+    const [fadeValue] = useState(new Animated.Value(0));
+    const [translateY] = useState(new Animated.Value(20));
+
+    useEffect(() => {
+      // Staggered animation for cards appearing
+      Animated.parallel([
+        Animated.timing(fadeValue, {
+          toValue: 1,
+          duration: 400,
+          delay: index * 80,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 400,
+          delay: index * 80,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, [fadeValue, translateY, index]);
+
+    const handlePressIn = () => {
+      Animated.spring(scaleValue, {
+        toValue: 0.96,
+        useNativeDriver: true,
+        tension: 100,
+        friction: 8,
+      }).start();
+    };
+
+    const handlePressOut = () => {
+      Animated.spring(scaleValue, {
+        toValue: 1,
+        useNativeDriver: true,
+        tension: 100,
+        friction: 8,
+      }).start();
+    };
+
+    const handlePress = () => {
+      setTimeout(() => {
+        navigation.navigate("PirithDetail", { pirith: pirith });
+      }, 50);
+    };
+
+    return (
+      <Animated.View
+        style={{
+          transform: [{ scale: scaleValue }, { translateY: translateY }],
+          opacity: fadeValue,
+        }}
+      >
+        <TouchableOpacity
+          style={styles.card}
+          onPress={handlePress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          activeOpacity={1}
+          accessibilityRole="button"
+          accessibilityLabel={pirith.title}
+        >
+          <View style={styles.cardContent}>
+            <Text style={styles.cardIcon}>{pirith.icon}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.cardTitle}>{pirith.title}</Text>
+              <Text style={styles.cardSubtext}>{pirith.subtext}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -31,25 +110,8 @@ const PirithScreen: React.FC = () => {
             ආරක්ෂණ පිරිත් ගාථා, පාලි සහ එහි සිංහල අරුත සමගින්
           </Text>
         </View>
-        {pirithList.map((pirith) => (
-          <TouchableOpacity
-            key={pirith.key}
-            style={styles.card}
-            activeOpacity={0.85}
-            onPress={() =>
-              navigation.navigate("PirithDetail", { pirith: pirith })
-            }
-            accessibilityRole="button"
-            accessibilityLabel={pirith.title}
-          >
-            <View style={styles.cardContent}>
-              <Text style={styles.cardIcon}>{pirith.icon}</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.cardTitle}>{pirith.title}</Text>
-                <Text style={styles.cardSubtext}>{pirith.subtext}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
+        {pirithList.map((pirith, index) => (
+          <PirithCard key={pirith.key} pirith={pirith} index={index} />
         ))}
       </ScrollView>
     </SafeAreaView>

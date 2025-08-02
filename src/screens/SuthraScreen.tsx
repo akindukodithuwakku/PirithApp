@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Dimensions,
+  Animated,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -20,6 +21,84 @@ const SuthraScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const suthraList = Object.values(SUTHRA_DATA);
 
+  const SuthraCard: React.FC<{ suthra: any; index: number }> = ({
+    suthra,
+    index,
+  }) => {
+    const [scaleValue] = useState(new Animated.Value(1));
+    const [fadeValue] = useState(new Animated.Value(0));
+    const [translateY] = useState(new Animated.Value(20));
+
+    useEffect(() => {
+      // Staggered animation for cards appearing
+      Animated.parallel([
+        Animated.timing(fadeValue, {
+          toValue: 1,
+          duration: 400,
+          delay: index * 80,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 400,
+          delay: index * 80,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, [fadeValue, translateY, index]);
+
+    const handlePressIn = () => {
+      Animated.spring(scaleValue, {
+        toValue: 0.96,
+        useNativeDriver: true,
+        tension: 100,
+        friction: 8,
+      }).start();
+    };
+
+    const handlePressOut = () => {
+      Animated.spring(scaleValue, {
+        toValue: 1,
+        useNativeDriver: true,
+        tension: 100,
+        friction: 8,
+      }).start();
+    };
+
+    const handlePress = () => {
+      setTimeout(() => {
+        navigation.navigate("SuthraDetail", { suthra: suthra });
+      }, 50);
+    };
+
+    return (
+      <Animated.View
+        style={{
+          transform: [{ scale: scaleValue }, { translateY: translateY }],
+          opacity: fadeValue,
+        }}
+      >
+        <TouchableOpacity
+          style={styles.card}
+          onPress={handlePress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          activeOpacity={1}
+          accessibilityRole="button"
+          accessibilityLabel={suthra.title}
+        >
+          <View style={styles.cardContent}>
+            <Text style={styles.cardIcon}>{suthra.icon}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.cardTitle}>{suthra.title}</Text>
+              <Text style={styles.cardSubtext}>{suthra.subtext}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -31,25 +110,8 @@ const SuthraScreen: React.FC = () => {
             වැදගත් සුත්‍ර දේශනාවන්, පාලි සහ එහි සිංහල අරුත සමගින්
           </Text>
         </View>
-        {suthraList.map((suthra) => (
-          <TouchableOpacity
-            key={suthra.key}
-            style={styles.card}
-            activeOpacity={0.85}
-            onPress={() =>
-              navigation.navigate("SuthraDetail", { suthra: suthra })
-            }
-            accessibilityRole="button"
-            accessibilityLabel={suthra.title}
-          >
-            <View style={styles.cardContent}>
-              <Text style={styles.cardIcon}>{suthra.icon}</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.cardTitle}>{suthra.title}</Text>
-                <Text style={styles.cardSubtext}>{suthra.subtext}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
+        {suthraList.map((suthra, index) => (
+          <SuthraCard key={suthra.key} suthra={suthra} index={index} />
         ))}
       </ScrollView>
     </SafeAreaView>
