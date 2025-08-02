@@ -18,7 +18,7 @@ function App() {
     fetchLatestRelease();
   }, []);
 
-    const fetchLatestRelease = async () => {
+  const fetchLatestRelease = async () => {
     try {
       setError(null);
       const repo =

@@ -11,16 +11,13 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "credentialsSource": "local"
-      },
-      "ios": {
-        "simulator": true
+        "credentialsSource": "remote"
       }
     },
     "production": {
       "android": {
         "buildType": "apk",
-        "credentialsSource": "local"
+        "credentialsSource": "remote"
       }
     }
   },

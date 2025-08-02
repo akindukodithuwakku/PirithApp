@@ -6,14 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       platform:
-        description: "Platform to build for (all, android, ios, website)"
+        description: "Platform to build for (all, android, website)"
         required: true
         default: "all"
         type: choice
         options:
           - all
           - android
-          - ios
           - website
 
 concurrency:
@@ -119,81 +118,21 @@ jobs:
           path: ./android-release.apk
           if-no-files-found: error
 
-  # iOS build
-  build-ios:
-    runs-on: macos-latest
-    if: github.event_name == 'push' || github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'all'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Setup Expo CLI
-        run: npm install -g @expo/cli eas-cli
-
-      - name: Setup EAS Authentication
-        run: |
-          if [ -z "$EXPO_TOKEN" ]; then
-            echo "Error: EXPO_TOKEN is not set or is empty"
-            exit 1
-          fi
-          echo "EXPO_TOKEN is set and ready for EAS authentication"
-          # EAS CLI will automatically use EXPO_TOKEN environment variable
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Build iOS IPA
-        run: |
-          eas build --platform ios --profile preview --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          REACT_APP_GITHUB_REPO: ${{ github.repository }}
-
-      - name: Download iOS IPA
-        run: |
-          # Download the latest IPA from the EAS build
-          eas build:download --platform ios --profile preview --path ./ios-release.ipa
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Upload iOS IPA
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-ipa
-          path: ./ios-release.ipa
-          if-no-files-found: error
-
-  # Create release with mobile builds
+  # Create release with Android build
   create-release:
-    needs: [build-android, build-ios]
+    needs: [build-android]
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'push' &&
-      (needs.build-android.result == 'success' || needs.build-ios.result == 'success')
+      needs.build-android.result == 'success'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Download Android APK
-        if: needs.build-android.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: android-apk
-          path: ./artifacts
-
-      - name: Download iOS IPA
-        if: needs.build-ios.result == 'success'
-        uses: actions/download-artifact@v4
-        with:
-          name: ios-ipa
           path: ./artifacts
 
       - name: Create Release
@@ -209,15 +148,12 @@ jobs:
 
             ### Downloads
             - **Android APK**: Direct installation for Android devices
-            - **iOS IPA**: For iOS devices (requires sideloading)
 
             ### Installation Instructions
             - **Android**: Download APK and enable "Install from unknown sources"
-            - **iOS**: Requires developer account or TestFlight
 
             Built automatically from commit: ${{ github.sha }}
           files: |
             ./artifacts/*.apk
-            ./artifacts/*.ipa
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
