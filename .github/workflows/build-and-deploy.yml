@@ -96,7 +96,24 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
+      - name: Check for recent builds
+        id: check-builds
+        run: |
+          # Check if there's a recent successful build (within last 2 hours)
+          RECENT_BUILD=$(eas build:list --platform android --status finished --limit 1 --json | jq -r '.[0] | select(.createdAt > (now - 7200 | strftime("%Y-%m-%dT%H:%M:%S.000Z"))) | .id')
+          if [ -n "$RECENT_BUILD" ]; then
+            echo "Recent build found: $RECENT_BUILD"
+            echo "skip_build=true" >> $GITHUB_OUTPUT
+            echo "build_id=$RECENT_BUILD" >> $GITHUB_OUTPUT
+          else
+            echo "No recent build found, will create new build"
+            echo "skip_build=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
       - name: Build Android APK
+        if: steps.check-builds.outputs.skip_build != 'true'
         run: |
           # Run the cloud build without --output
           eas build --platform android --profile preview --non-interactive
@@ -106,8 +123,15 @@ jobs:
 
       - name: Download Android APK
         run: |
-          # Download the latest APK from the EAS build
-          eas build:download --platform android --profile preview --path ./android-release.apk
+          # Use the build ID from the check step or get the latest
+          if [ "${{ steps.check-builds.outputs.skip_build }}" = "true" ]; then
+            BUILD_ID="${{ steps.check-builds.outputs.build_id }}"
+            echo "Using existing build ID: $BUILD_ID"
+          else
+            BUILD_ID=$(eas build:list --platform android --status finished --limit 1 --json | jq -r '.[0].id')
+            echo "Using new build ID: $BUILD_ID"
+          fi
+          eas build:download $BUILD_ID --path ./android-release.apk
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 

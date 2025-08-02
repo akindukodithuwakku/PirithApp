@@ -1,0 +1,47 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="512" cy="512" r="512" fill="#8B4513"/>
+  
+  <!-- Inner circle -->
+  <circle cx="512" cy="512" r="400" fill="#DAA520"/>
+  
+  <!-- Lotus petals -->
+  <g fill="#FFD700" stroke="#B8860B" stroke-width="8">
+    <!-- Outer petals -->
+    <ellipse cx="512" cy="200" rx="80" ry="120" transform="rotate(0 512 512)"/>
+    <ellipse cx="512" cy="200" rx="80" ry="120" transform="rotate(45 512 512)"/>
+    <ellipse cx="512" cy="200" rx="80" ry="120" transform="rotate(90 512 512)"/>
+    <ellipse cx="512" cy="200" rx="80" ry="120" transform="rotate(135 512 512)"/>
+    <ellipse cx="512" cy="200" rx="80" ry="120" transform="rotate(180 512 512)"/>
+    <ellipse cx="512" cy="200" rx="80" ry="120" transform="rotate(225 512 512)"/>
+    <ellipse cx="512" cy="200" rx="80" ry="120" transform="rotate(270 512 512)"/>
+    <ellipse cx="512" cy="200" rx="80" ry="120" transform="rotate(315 512 512)"/>
+    
+    <!-- Inner petals -->
+    <ellipse cx="512" cy="300" rx="60" ry="90" transform="rotate(22.5 512 512)"/>
+    <ellipse cx="512" cy="300" rx="60" ry="90" transform="rotate(67.5 512 512)"/>
+    <ellipse cx="512" cy="300" rx="60" ry="90" transform="rotate(112.5 512 512)"/>
+    <ellipse cx="512" cy="300" rx="60" ry="90" transform="rotate(157.5 512 512)"/>
+    <ellipse cx="512" cy="300" rx="60" ry="90" transform="rotate(202.5 512 512)"/>
+    <ellipse cx="512" cy="300" rx="60" ry="90" transform="rotate(247.5 512 512)"/>
+    <ellipse cx="512" cy="300" rx="60" ry="90" transform="rotate(292.5 512 512)"/>
+    <ellipse cx="512" cy="300" rx="60" ry="90" transform="rotate(337.5 512 512)"/>
+  </g>
+  
+  <!-- Center circle -->
+  <circle cx="512" cy="512" r="80" fill="#8B4513"/>
+  
+  <!-- Dharma wheel spokes -->
+  <g stroke="#FFD700" stroke-width="12" stroke-linecap="round">
+    <line x1="512" y1="432" x2="512" y2="592"/>
+    <line x1="432" y1="512" x2="592" y2="512"/>
+    <line x1="452" y1="452" x2="572" y2="572"/>
+    <line x1="572" y1="452" x2="452" y2="572"/>
+  </g>
+  
+  <!-- Center dot -->
+  <circle cx="512" cy="512" r="20" fill="#FFD700"/>
+  
+  <!-- Text "P" for Pirith -->
+  <text x="512" y="750" font-family="Arial, sans-serif" font-size="120" font-weight="bold" text-anchor="middle" fill="#8B4513">P</text>
+</svg> 
