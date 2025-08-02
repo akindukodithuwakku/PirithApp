@@ -11,7 +11,7 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk",
-        "credentialsSource": "remote"
+        "credentialsSource": "local"
       },
       "ios": {
         "simulator": true
@@ -20,7 +20,7 @@
     "production": {
       "android": {
         "buildType": "apk",
-        "credentialsSource": "remote"
+        "credentialsSource": "local"
       }
     }
   },
