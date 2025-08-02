@@ -1,6 +1,10 @@
 {
-  "buildId": "986805a3-1e51-4c9e-82ff-8b89f575a6e9",
-  "downloadUrl": "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
-  "buildDate": "2025-08-02T08:11:30.996Z",
-  "version": "manual"
+  "buildId": "4ae2b552-ba7f-439a-9970-4502a7fcf6be",
+  "downloadUrl": "https://expo.dev/artifacts/eas/afkxRf39uzGFiLHocYVC17.apk",
+  "buildDate": "2025-08-02T21:16:06.350Z",
+  "version": "1.0.0",
+  "platform": "Android",
+  "profile": "preview",
+  "status": "finished",
+  "logsUrl": "https://expo.dev/accounts/akindu2002/projects/thepirithapp/builds/4ae2b552-ba7f-439a-9970-4502a7fcf6be"
 }
