@@ -27,9 +27,9 @@ function App() {
         console.log("No build info found, using fallback");
         // Fallback build info
         setBuildInfo({
-          buildId: "986805a3-1e51-4c9e-82ff-8b89f575a6e9",
+          buildId: "4ae2b552-ba7f-439a-9970-4502a7fcf6be",
           downloadUrl:
-            "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
+            "https://expo.dev/artifacts/eas/afkxRf39uzGFiLHocYVC17.apk",
           buildDate: new Date().toISOString(),
           version: "1.0.0",
         });
@@ -38,9 +38,9 @@ function App() {
       console.error("Error fetching build info:", error);
       // Fallback build info
       setBuildInfo({
-        buildId: "986805a3-1e51-4c9e-82ff-8b89f575a6e9",
+        buildId: "4ae2b552-ba7f-439a-9970-4502a7fcf6be",
         downloadUrl:
-          "https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk",
+          "https://expo.dev/artifacts/eas/afkxRf39uzGFiLHocYVC17.apk",
         buildDate: new Date().toISOString(),
         version: "1.0.0",
       });
@@ -75,8 +75,8 @@ function App() {
     },
     {
       icon: ShieldCheckIcon,
-      title: "Offline Access",
-      description: "Download content for offline reading and listening",
+      title: "Online Access",
+      description: "Access content directly from the web for instant viewing",
     },
   ];
 
@@ -265,7 +265,7 @@ function App() {
               </h3>
               <ul className="text-gray-600 space-y-2">
                 <li>• Bilingual content (Pali & Sinhala)</li>
-                <li>• Offline reading capability</li>
+                <li>• Online viewing capability</li>
                 <li>• Beautiful, intuitive interface</li>
                 <li>• Search functionality</li>
                 <li>• Bookmark favorite texts</li>

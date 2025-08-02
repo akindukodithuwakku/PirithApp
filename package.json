@@ -28,8 +28,6 @@
     "react-native-gesture-handler": "~2.24.0",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
-    "expo-file-system": "~16.0.8",
-    "expo-sharing": "~13.1.4",
     "expo-linking": "~6.2.2"
   },
   "devDependencies": {

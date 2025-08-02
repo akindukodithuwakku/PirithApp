@@ -45,7 +45,7 @@ jobs:
       - name: Create Build Info for Website
         run: |
           echo "Creating build info for website..."
-          npm run manual-build-info 986805a3-1e51-4c9e-82ff-8b89f575a6e9
+          npm run manual-build-info 4ae2b552-ba7f-439a-9970-4502a7fcf6be https://expo.dev/artifacts/eas/afkxRf39uzGFiLHocYVC17.apk
           echo "Build info created successfully!"
           echo "Contents of build-info.json:"
           cat build-info.json
@@ -153,10 +153,13 @@ jobs:
             ## ThePirithApp Release v${{ github.run_number }}
 
             ### What's New
+            - Removed all storage dependencies for online-only functionality
+            - Updated PDF viewer for browser-based viewing
+            - Optimized app size and performance
             - Latest updates and bug fixes
 
             ### Downloads
-            - **Android APK**: [Download from EAS](https://expo.dev/artifacts/eas/986805a3-1e51-4c9e-82ff-8b89f575a6e9.apk)
+            - **Android APK**: [Download from EAS](https://expo.dev/artifacts/eas/afkxRf39uzGFiLHocYVC17.apk)
 
             ### Installation Instructions
             - **Android**: Download APK and enable "Install from unknown sources"
@@ -164,7 +167,9 @@ jobs:
             Built automatically from commit: ${{ github.sha }}
 
             ### Build Information
-            - Android Build ID: 986805a3-1e51-4c9e-82ff-8b89f575a6e9
+            - Android Build ID: 4ae2b552-ba7f-439a-9970-4502a7fcf6be
             - Build Date: ${{ github.event.head_commit.timestamp }}
+            - Platform: Android
+            - Profile: Preview
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

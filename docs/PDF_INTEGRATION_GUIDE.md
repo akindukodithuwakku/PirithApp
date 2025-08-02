@@ -90,18 +90,14 @@ Dashboard → Jataka Katha → Jataka Detail → PDF Viewer
 
 ```json
 {
-  "react-native-pdf": "^6.7.4",
-  "react-native-blob-util": "^0.19.6",
-  "expo-file-system": "~16.0.8",
-  "expo-sharing": "~12.0.3"
+  "expo-linking": "~6.2.2"
 }
 ```
 
 ### 2. **Key Features**
 
 - **Browser Integration**: Opens PDFs in default browser
-- **File Download**: Downloads PDFs to device
-- **Share Functionality**: Share downloaded PDFs
+- **Online Viewing**: View PDFs directly in browser
 - **Error Handling**: Graceful error management
 - **Loading States**: User feedback during operations
 
@@ -146,15 +142,15 @@ The 550 Jataka stories are organized into 12 collections:
 
 ### 2. **Storage Efficiency**
 
-- Minimal local storage required
-- No need for large content databases
-- Efficient caching strategy
+- No local storage required
+- No file downloads or caching
+- Pure online viewing experience
 
 ### 3. **Network Optimization**
 
-- Only downloads when needed
+- Streams content directly from source
 - Respects user's data usage
-- Progressive loading approach
+- No local file storage
 
 ## User Interface Features
 

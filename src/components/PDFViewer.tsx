@@ -10,8 +10,6 @@ import {
   Linking,
 } from "react-native";
 import { Colors } from "../constants/Colors";
-import * as FileSystem from "expo-file-system";
-import * as Sharing from "expo-sharing";
 
 interface PDFViewerProps {
   pdfUrl: string;
@@ -23,7 +21,6 @@ const { width, height } = Dimensions.get("window");
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl, title, onError }) => {
   const [loading, setLoading] = useState(false);
-  const [downloading, setDownloading] = useState(false);
 
   const handleOpenInBrowser = async () => {
     try {
@@ -45,50 +42,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl, title, onError }) => {
     }
   };
 
-  const handleDownloadPDF = async () => {
-    setDownloading(true);
-    try {
-      // Create a temporary file path
-      const fileName = `${title.replace(/\s+/g, "_")}.pdf`;
-      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-
-      // Download the PDF
-      const downloadResult = await FileSystem.downloadAsync(pdfUrl, fileUri);
-
-      if (downloadResult.status === 200) {
-        // Check if sharing is available
-        const isAvailable = await Sharing.isAvailableAsync();
-        if (isAvailable) {
-          await Sharing.shareAsync(fileUri, {
-            mimeType: "application/pdf",
-            dialogTitle: `Download ${title}`,
-          });
-        } else {
-          Alert.alert("Download Complete", `PDF saved to: ${fileUri}`, [
-            { text: "OK" },
-          ]);
-        }
-      } else {
-        Alert.alert("Download Failed", "Unable to download the PDF file.");
-        onError?.("Download failed");
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to download the PDF file.");
-      onError?.("Download error");
-    } finally {
-      setDownloading(false);
-    }
-  };
-
   const handleViewOnline = () => {
-    Alert.alert(
-      "View PDF",
-      "This will open the PDF in your browser for viewing.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Open Browser", onPress: handleOpenInBrowser },
-      ]
-    );
+    handleOpenInBrowser();
   };
 
   return (
@@ -120,22 +75,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl, title, onError }) => {
             ) : (
               <>
                 <Text style={styles.actionButtonIcon}>🌐</Text>
-                <Text style={styles.primaryButtonText}>View Online</Text>
-              </>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionButton, styles.secondaryButton]}
-            onPress={handleDownloadPDF}
-            disabled={downloading}
-          >
-            {downloading ? (
-              <ActivityIndicator color={Colors.secondary} size="small" />
-            ) : (
-              <>
-                <Text style={styles.actionButtonIcon}>📥</Text>
-                <Text style={styles.secondaryButtonText}>Download PDF</Text>
+                <Text style={styles.primaryButtonText}>View PDF Online</Text>
               </>
             )}
           </TouchableOpacity>
@@ -144,15 +84,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ pdfUrl, title, onError }) => {
         <View style={styles.infoCard}>
           <Text style={styles.infoTitle}>📋 Instructions</Text>
           <Text style={styles.infoText}>
-            • <Text style={styles.boldText}>View Online:</Text> Opens the PDF in
-            your browser
-          </Text>
-          <Text style={styles.infoText}>
-            • <Text style={styles.boldText}>Download PDF:</Text> Saves the file
-            to your device
+            • <Text style={styles.boldText}>View PDF Online:</Text> Opens the
+            PDF in your browser
           </Text>
           <Text style={styles.infoText}>
             • The PDF will open in your default browser or PDF viewer
+          </Text>
+          <Text style={styles.infoText}>
+            • Requires internet connection to view the content
           </Text>
         </View>
 
@@ -246,10 +185,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.secondary,
     borderColor: Colors.secondary,
   },
-  secondaryButton: {
-    backgroundColor: Colors.background,
-    borderColor: Colors.secondary,
-  },
+
   actionButtonIcon: {
     fontSize: 20,
     marginRight: 8,
@@ -259,11 +195,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: Colors.background,
   },
-  secondaryButtonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: Colors.secondary,
-  },
+
   infoCard: {
     backgroundColor: Colors.overlay,
     borderRadius: 12,
