@@ -12,6 +12,7 @@ import {
 function App() {
   const [latestRelease, setLatestRelease] = useState(null);
   const [buildInfo, setBuildInfo] = useState(null);
+  const [iosBuildInfo, setIosBuildInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -23,12 +24,9 @@ function App() {
     try {
       setError(null);
       setLoading(true);
-      
+
       // Fetch both GitHub release and build info
-      await Promise.all([
-        fetchLatestRelease(),
-        fetchBuildInfo()
-      ]);
+      await Promise.all([fetchLatestRelease(), fetchBuildInfo(), fetchIosBuildInfo()]);
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to fetch information. Please try again later.");
@@ -65,13 +63,27 @@ function App() {
   const fetchBuildInfo = async () => {
     try {
       // Try to fetch build info from the website's public folder
-      const response = await fetch('/build-info.json');
+      const response = await fetch("/build-info.json");
       if (response.ok) {
         const data = await response.json();
         setBuildInfo(data);
       }
     } catch (error) {
       console.error("Error fetching build info:", error);
+      // Don't set error here, just log it
+    }
+  };
+
+  const fetchIosBuildInfo = async () => {
+    try {
+      // Try to fetch iOS build info from the website's public folder
+      const response = await fetch("/ios-build-info.json");
+      if (response.ok) {
+        const data = await response.json();
+        setIosBuildInfo(data);
+      }
+    } catch (error) {
+      console.error("Error fetching iOS build info:", error);
       // Don't set error here, just log it
     }
   };
@@ -266,7 +278,9 @@ function App() {
                   {/* Show EAS build link if available */}
                   {buildInfo && buildInfo.downloadUrl ? (
                     <button
-                      onClick={() => window.open(buildInfo.downloadUrl, '_blank')}
+                      onClick={() =>
+                        window.open(buildInfo.downloadUrl, "_blank")
+                      }
                       className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
                     >
                       <CloudArrowDownIcon className="w-5 h-5 mr-2" />
@@ -283,7 +297,8 @@ function App() {
                           className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
                         >
                           <CloudArrowDownIcon className="w-5 h-5 mr-2" />
-                          Download APK ({Math.round(asset.size / 1024 / 1024)}MB)
+                          Download APK ({Math.round(asset.size / 1024 / 1024)}
+                          MB)
                         </button>
                       ))
                   )}
@@ -298,18 +313,31 @@ function App() {
                   <p className="text-gray-600 mb-4">
                     Download the IPA file for iOS devices (requires sideloading)
                   </p>
-                  {downloadAssets
-                    .filter((asset) => asset.name.includes(".ipa"))
-                    .map((asset, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleDownload(asset)}
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
-                      >
-                        <CloudArrowDownIcon className="w-5 h-5 mr-2" />
-                        Download IPA ({Math.round(asset.size / 1024 / 1024)}MB)
-                      </button>
-                    ))}
+
+                  {/* Show EAS build link if available */}
+                  {iosBuildInfo && iosBuildInfo.downloadUrl ? (
+                    <button
+                      onClick={() => window.open(iosBuildInfo.downloadUrl, '_blank')}
+                      className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
+                    >
+                      <CloudArrowDownIcon className="w-5 h-5 mr-2" />
+                      Download IPA v{iosBuildInfo.version}
+                    </button>
+                  ) : (
+                    // Fallback to GitHub releases
+                    downloadAssets
+                      .filter((asset) => asset.name.includes(".ipa"))
+                      .map((asset, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleDownload(asset)}
+                          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center transition-colors"
+                        >
+                          <CloudArrowDownIcon className="w-5 h-5 mr-2" />
+                          Download IPA ({Math.round(asset.size / 1024 / 1024)}MB)
+                        </button>
+                      ))
+                  )}
                 </div>
               </div>
 

@@ -6,13 +6,14 @@ on:
   workflow_dispatch:
     inputs:
       platform:
-        description: "Platform to build for (all, android, website)"
+        description: "Platform to build for (all, android, ios, website)"
         required: true
         default: "all"
         type: choice
         options:
           - all
           - android
+          - ios
           - website
 
 concurrency:
@@ -194,21 +195,149 @@ jobs:
           cp build-info.json website/public/
           echo "Copied build-info.json to website/public/"
 
-  # Create release with build info
-  create-release:
-    needs: [build-android]
+  # iOS build
+  build-ios:
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'push' &&
-      needs.build-android.result == 'success'
+    if: github.event_name == 'push' || github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'all'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download Build Info
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Expo CLI
+        run: npm install -g @expo/cli eas-cli
+
+      - name: Setup EAS Authentication
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "Error: EXPO_TOKEN is not set or is empty"
+            exit 1
+          fi
+          echo "EXPO_TOKEN is set and ready for EAS authentication"
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Check for recent iOS builds
+        id: check-ios-builds
+        run: |
+          echo "Checking for recent iOS builds..."
+          
+          BUILD_LIST=$(eas build:list --platform ios --status finished --limit 1 --json 2>/dev/null || echo "[]")
+          
+          if [ "$BUILD_LIST" = "[]" ] || [ -z "$BUILD_LIST" ]; then
+            echo "No iOS builds found, will create new build"
+            echo "skip_build=false" >> $GITHUB_OUTPUT
+          else
+            BUILD_ID=$(echo "$BUILD_LIST" | jq -r '.[0].id // empty' 2>/dev/null || echo "")
+            CREATED_AT=$(echo "$BUILD_LIST" | jq -r '.[0].createdAt // empty' 2>/dev/null || echo "")
+            
+            if [ -n "$BUILD_ID" ] && [ -n "$CREATED_AT" ]; then
+              echo "Found iOS build: $BUILD_ID created at $CREATED_AT"
+              echo "Using existing build"
+              echo "skip_build=true" >> $GITHUB_OUTPUT
+              echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+            else
+              echo "Could not parse iOS build information, will create new build"
+              echo "skip_build=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build iOS IPA
+        if: steps.check-ios-builds.outputs.skip_build != 'true'
+        run: |
+          eas build --platform ios --profile preview --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          REACT_APP_GITHUB_REPO: ${{ github.repository }}
+
+      - name: Get iOS Build Download Link
+        id: get-ios-build-link
+        run: |
+          echo "Getting latest iOS build download link..."
+          BUILD_LIST=$(eas build:list --platform ios --status finished --limit 1 --json 2>/dev/null || echo "[]")
+          
+          if [ "$BUILD_LIST" = "[]" ] || [ -z "$BUILD_LIST" ]; then
+            echo "Error: No iOS builds found"
+            exit 1
+          fi
+          
+          BUILD_ID=$(echo "$BUILD_LIST" | jq -r '.[0].id // empty' 2>/dev/null || echo "")
+          DOWNLOAD_URL=$(echo "$BUILD_LIST" | jq -r '.[0].artifacts.buildUrl // empty' 2>/dev/null || echo "")
+          
+          if [ -z "$BUILD_ID" ]; then
+            echo "Error: Could not extract iOS build ID"
+            exit 1
+          fi
+          
+          if [ -z "$DOWNLOAD_URL" ]; then
+            echo "Error: Could not extract iOS download URL"
+            exit 1
+          fi
+          
+          echo "iOS Build ID: $BUILD_ID"
+          echo "iOS Download URL: $DOWNLOAD_URL"
+          echo "ios_build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+          echo "ios_download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Create iOS Build Info File
+        run: |
+          cat > ios-build-info.json << EOF
+          {
+            "buildId": "${{ steps.get-ios-build-link.outputs.ios_build_id }}",
+            "downloadUrl": "${{ steps.get-ios-build-link.outputs.ios_download_url }}",
+            "buildDate": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            "version": "${{ github.run_number }}"
+          }
+          EOF
+          echo "Created ios-build-info.json:"
+          cat ios-build-info.json
+
+      - name: Upload iOS Build Info
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-info
+          path: ios-build-info.json
+          if-no-files-found: error
+
+      - name: Copy iOS Build Info to Website
+        run: |
+          cp ios-build-info.json website/public/
+          echo "Copied ios-build-info.json to website/public/"
+
+  # Create release with build info
+  create-release:
+    needs: [build-android, build-ios]
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'push' &&
+      needs.build-android.result == 'success' &&
+      needs.build-ios.result == 'success'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Android Build Info
         uses: actions/download-artifact@v4
         with:
           name: build-info
+          path: ./artifacts
+
+      - name: Download iOS Build Info
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-build-info
           path: ./artifacts
 
       - name: Create Release
@@ -224,14 +353,17 @@ jobs:
 
             ### Downloads
             - **Android APK**: [Download from EAS](https://expo.dev/artifacts/eas/${{ needs.build-android.outputs.build_id }}.apk)
+            - **iOS IPA**: [Download from EAS](https://expo.dev/artifacts/eas/${{ needs.build-ios.outputs.ios_build_id }}.ipa)
 
             ### Installation Instructions
             - **Android**: Download APK and enable "Install from unknown sources"
+            - **iOS**: Download IPA and use AltStore or Sideloadly for installation
 
             Built automatically from commit: ${{ github.sha }}
             
             ### Build Information
-            - Build ID: ${{ needs.build-android.outputs.build_id }}
-            - Build Date: ${{ needs.build-android.outputs.build_date }}
+            - Android Build ID: ${{ needs.build-android.outputs.build_id }}
+            - iOS Build ID: ${{ needs.build-ios.outputs.ios_build_id }}
+            - Build Date: ${{ github.event.head_commit.timestamp }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
