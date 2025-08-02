@@ -10,7 +10,12 @@
     "build:android": "eas build --platform android --profile preview",
     "build:android-prod": "eas build --platform android --profile production",
     "build:all": "eas build --platform all --profile preview",
-    "manual-build-info": "node scripts/manual-build-info.js"
+    "manual-build-info": "node scripts/manual-build-info.js",
+    "check-build-needed": "node scripts/check-build-needed.js",
+    "build:cache:check": "node scripts/manage-build-cache.js check",
+    "build:cache:stats": "node scripts/manage-build-cache.js stats",
+    "build:cache:record": "node scripts/manage-build-cache.js record",
+    "build:cache:reset": "node scripts/manage-build-cache.js reset"
   },
   "dependencies": {
     "@react-navigation/native": "^7.1.14",

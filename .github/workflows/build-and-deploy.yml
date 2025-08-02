@@ -96,16 +96,9 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Build Android APK
+      - name: Create Build Info (Use Existing Build)
         run: |
-          eas build --platform android --profile preview --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          REACT_APP_GITHUB_REPO: ${{ github.repository }}
-
-      - name: Create Manual Build Info
-        run: |
-          echo "Creating manual build info file..."
+          echo "Using existing build ID: 986805a3-1e51-4c9e-82ff-8b89f575a6e9"
           npm run manual-build-info 986805a3-1e51-4c9e-82ff-8b89f575a6e9
           echo "Build info created successfully!"
 
@@ -128,6 +121,8 @@ jobs:
     if: |
       github.event_name == 'push' &&
       needs.build-android.result == 'success'
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -156,7 +151,7 @@ jobs:
             - **Android**: Download APK and enable "Install from unknown sources"
 
             Built automatically from commit: ${{ github.sha }}
-            
+
             ### Build Information
             - Android Build ID: 986805a3-1e51-4c9e-82ff-8b89f575a6e9
             - Build Date: ${{ github.event.head_commit.timestamp }}
