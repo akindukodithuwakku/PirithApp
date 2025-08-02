@@ -25,7 +25,7 @@ const Angulimala_Piritha_Pali = `
 
 නාභිජානාමි සංචිච්ච පාණං ජීවිතා වොරො පෙතා
 
-තෙන සච්චෙන සොථිතෙ හොතු සොත්ථි ගබ්භස්සාති
+තෙන සච්චෙන සොථිතෙ හොතු සොත්ථි ගබ්භස්සාති>
 `;
 
 export default Angulimala_Piritha_Pali;
