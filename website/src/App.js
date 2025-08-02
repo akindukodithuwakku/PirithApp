@@ -29,7 +29,8 @@ function App() {
         console.log("No Android build info found, using fallback");
         setAndroidBuildInfo({
           buildId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-          downloadUrl: "https://expo.dev/artifacts/eas/a1b2c3d4-e5f6-7890-abcd-ef1234567890.apk",
+          downloadUrl:
+            "https://expo.dev/artifacts/eas/a1b2c3d4-e5f6-7890-abcd-ef1234567890.apk",
           buildDate: new Date().toISOString(),
           version: "1.0.1",
           platform: "android",
@@ -57,7 +58,8 @@ function App() {
       // Fallback build info
       setAndroidBuildInfo({
         buildId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-        downloadUrl: "https://expo.dev/artifacts/eas/a1b2c3d4-e5f6-7890-abcd-ef1234567890.apk",
+        downloadUrl:
+          "https://expo.dev/artifacts/eas/a1b2c3d4-e5f6-7890-abcd-ef1234567890.apk",
         buildDate: new Date().toISOString(),
         version: "1.0.1",
         platform: "android",
