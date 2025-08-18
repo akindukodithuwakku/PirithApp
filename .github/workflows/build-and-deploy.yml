@@ -45,7 +45,7 @@ jobs:
       - name: Create Build Info for Website
         run: |
           echo "Creating build info for website..."
-          npm run manual-build-info 4ae2b552-ba7f-439a-9970-4502a7fcf6be https://expo.dev/artifacts/eas/afkxRf39uzGFiLHocYVC17.apk
+          npm run manual-build-info 4ae2b552-ba7f-439a-9970-4502a7fcf6be "https://drive.google.com/uc?export=download&id=YOUR_GOOGLE_DRIVE_FILE_ID"
           echo "Build info created successfully!"
           echo "Contents of build-info.json:"
           cat build-info.json
@@ -159,7 +159,7 @@ jobs:
             - Latest updates and bug fixes
 
             ### Downloads
-            - **Android APK**: [Download from EAS](https://expo.dev/artifacts/eas/afkxRf39uzGFiLHocYVC17.apk)
+            - **Android APK**: [Download from Google Drive](https://drive.google.com/uc?export=download&id=YOUR_GOOGLE_DRIVE_FILE_ID)
 
             ### Installation Instructions
             - **Android**: Download APK and enable "Install from unknown sources"

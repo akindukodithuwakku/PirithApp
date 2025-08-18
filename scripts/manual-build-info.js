@@ -7,7 +7,7 @@ const path = require("path");
 const buildId = process.argv[2] || "4ae2b552-ba7f-439a-9970-4502a7fcf6be";
 
 // Get download URL from command line argument or use default
-const downloadUrl = process.argv[3] || "https://expo.dev/artifacts/eas/afkxRf39uzGFiLHocYVC17.apk";
+const downloadUrl = process.argv[3] || "https://drive.google.com/uc?export=download&id=YOUR_GOOGLE_DRIVE_FILE_ID";
 
 // Create build info object
 const buildInfo = {
@@ -44,5 +44,5 @@ console.log(`   - ${websitePath}`);
 console.log("");
 console.log("💡 Usage: node scripts/manual-build-info.js <build-id> [download-url]");
 console.log(
-  "💡 Example: node scripts/manual-build-info.js 4ae2b552-ba7f-439a-9970-4502a7fcf6be https://expo.dev/artifacts/eas/afkxRf39uzGFiLHocYVC17.apk"
+  "💡 Example: node scripts/manual-build-info.js 4ae2b552-ba7f-439a-9970-4502a7fcf6be https://drive.google.com/uc?export=download&id=YOUR_GOOGLE_DRIVE_FILE_ID"
 );
