@@ -29,7 +29,7 @@ function App() {
         setBuildInfo({
           buildId: "4ae2b552-ba7f-439a-9970-4502a7fcf6be",
           downloadUrl:
-            "https://drive.google.com/uc?export=download&id=YOUR_GOOGLE_DRIVE_FILE_ID",
+            "https://drive.google.com/uc?export=download&id=1x21c_YbxtzOERDKeG3GgCwhWmZDvoxbL",
           buildDate: new Date().toISOString(),
           version: "1.0.0",
         });
@@ -40,7 +40,7 @@ function App() {
       setBuildInfo({
         buildId: "4ae2b552-ba7f-439a-9970-4502a7fcf6be",
         downloadUrl:
-          "https://drive.google.com/uc?export=download&id=YOUR_GOOGLE_DRIVE_FILE_ID",
+          "https://drive.google.com/uc?export=download&id=1x21c_YbxtzOERDKeG3GgCwhWmZDvoxbL",
         buildDate: new Date().toISOString(),
         version: "1.0.0",
       });

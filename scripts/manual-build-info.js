@@ -7,7 +7,9 @@ const path = require("path");
 const buildId = process.argv[2] || "4ae2b552-ba7f-439a-9970-4502a7fcf6be";
 
 // Get download URL from command line argument or use default
-const downloadUrl = process.argv[3] || "https://drive.google.com/uc?export=download&id=YOUR_GOOGLE_DRIVE_FILE_ID";
+const downloadUrl =
+  process.argv[3] ||
+  "https://drive.google.com/uc?export=download&id=1x21c_YbxtzOERDKeG3GgCwhWmZDvoxbL";
 
 // Create build info object
 const buildInfo = {
@@ -18,7 +20,7 @@ const buildInfo = {
   platform: "Android",
   profile: "preview",
   status: "finished",
-  logsUrl: `https://expo.dev/accounts/akindu2002/projects/thepirithapp/builds/${buildId}`
+  logsUrl: `https://expo.dev/accounts/akindu2002/projects/thepirithapp/builds/${buildId}`,
 };
 
 // Write to build-info.json
@@ -42,7 +44,9 @@ console.log(`📄 Files created:`);
 console.log(`   - ${buildInfoPath}`);
 console.log(`   - ${websitePath}`);
 console.log("");
-console.log("💡 Usage: node scripts/manual-build-info.js <build-id> [download-url]");
 console.log(
-  "💡 Example: node scripts/manual-build-info.js 4ae2b552-ba7f-439a-9970-4502a7fcf6be https://drive.google.com/uc?export=download&id=YOUR_GOOGLE_DRIVE_FILE_ID"
+  "💡 Usage: node scripts/manual-build-info.js <build-id> [download-url]"
+);
+console.log(
+  "💡 Example: node scripts/manual-build-info.js 4ae2b552-ba7f-439a-9970-4502a7fcf6be https://drive.google.com/uc?export=download&id=1x21c_YbxtzOERDKeG3GgCwhWmZDvoxbL"
 );
