@@ -1,10 +1,13 @@
 {
   "buildId": "4ae2b552-ba7f-439a-9970-4502a7fcf6be",
   "downloadUrl": "https://drive.google.com/uc?export=download&id=1x21c_YbxtzOERDKeG3GgCwhWmZDvoxbL",
-  "buildDate": "2025-08-02T21:16:06.350Z",
+  "buildDate": "2024-12-19T10:00:00.000Z",
   "version": "1.0.0",
   "platform": "Android",
   "profile": "preview",
   "status": "finished",
-  "logsUrl": "https://expo.dev/accounts/akindu2002/projects/thepirithapp/builds/4ae2b552-ba7f-439a-9970-4502a7fcf6be"
+  "logsUrl": "https://expo.dev/accounts/akindu2002/projects/thepirithapp/builds/4ae2b552-ba7f-439a-9970-4502a7fcf6be",
+  "fileSize": "~25 MB",
+  "minAndroidVersion": "6.0",
+  "targetAndroidVersion": "13.0"
 }

@@ -6,6 +6,8 @@ import {
   BookOpenIcon,
   HeartIcon,
   ShieldCheckIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 
 function App() {
@@ -32,6 +34,9 @@ function App() {
             "https://drive.google.com/uc?export=download&id=1x21c_YbxtzOERDKeG3GgCwhWmZDvoxbL",
           buildDate: new Date().toISOString(),
           version: "1.0.0",
+          platform: "Android",
+          profile: "preview",
+          status: "finished",
         });
       }
     } catch (error) {
@@ -43,6 +48,9 @@ function App() {
           "https://drive.google.com/uc?export=download&id=1x21c_YbxtzOERDKeG3GgCwhWmZDvoxbL",
         buildDate: new Date().toISOString(),
         version: "1.0.0",
+        platform: "Android",
+        profile: "preview",
+        status: "finished",
       });
     } finally {
       setLoading(false);
@@ -51,6 +59,8 @@ function App() {
 
   const handleDownload = () => {
     if (buildInfo && buildInfo.downloadUrl) {
+      // Track download attempt
+      console.log("Download initiated for version:", buildInfo.version);
       window.open(buildInfo.downloadUrl, "_blank");
     }
   };
@@ -99,14 +109,15 @@ function App() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12">
-        {/* Download Section - PROMINENT */}
+        {/* Download Section - ENHANCED AND PROMINENT */}
         <section className="mb-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-              Download ThePirithApp
+              📱 Download ThePirithApp APK
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Download the latest version of ThePirithApp for Android
+              Get the latest Android APK version for direct installation on your
+              device
             </p>
           </div>
 
@@ -118,62 +129,165 @@ function App() {
               </p>
             </div>
           ) : buildInfo ? (
-            <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl p-8 max-w-3xl mx-auto border-2 border-buddhist-200">
+              {/* Version and Status Header */}
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-100 text-green-800 text-sm font-medium mb-4">
+                  <CheckCircleIcon className="w-4 h-4 mr-2" />
                   Latest Version Available
+                </div>
+                <h3 className="text-3xl font-bold text-gray-800 mb-2">
+                  Version {buildInfo.version}
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  Version {buildInfo.version} • Built on{" "}
-                  {new Date(buildInfo.buildDate).toLocaleDateString()}
+                <p className="text-gray-600 mb-2">
+                  Built on{" "}
+                  {new Date(buildInfo.buildDate).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Platform: {buildInfo.platform} • Profile: {buildInfo.profile}
                 </p>
               </div>
 
-              {/* Android Download - PROMINENT */}
-              <div className="border-2 border-buddhist-200 rounded-xl p-6 bg-buddhist-50">
-                <div className="flex items-center mb-4">
-                  <DevicePhoneMobileIcon className="w-8 h-8 text-green-500 mr-3" />
-                  <h4 className="text-xl font-semibold text-gray-800">
-                    Android APK
-                  </h4>
-                </div>
-                <p className="text-gray-600 mb-6">
-                  Download the APK file for direct installation on Android
-                  devices
-                </p>
+              {/* Android Download - ENHANCED */}
+              <div className="border-2 border-green-200 rounded-xl p-6 bg-green-50 relative overflow-hidden">
+                {/* Decorative background */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-green-100 rounded-full -mr-16 -mt-16 opacity-50"></div>
 
-                <button
-                  onClick={handleDownload}
-                  className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-lg flex items-center justify-center transition-colors text-lg"
-                >
-                  <CloudArrowDownIcon className="w-6 h-6 mr-3" />
-                  Download APK v{buildInfo.version}
-                </button>
+                <div className="relative z-10">
+                  <div className="flex items-center mb-4">
+                    <DevicePhoneMobileIcon className="w-10 h-10 text-green-600 mr-3" />
+                    <div>
+                      <h4 className="text-2xl font-bold text-gray-800">
+                        Android APK Download
+                      </h4>
+                      <p className="text-green-700 font-medium">
+                        Ready for Installation
+                      </p>
+                    </div>
+                  </div>
 
-                <div className="mt-4 text-sm text-gray-500 text-center">
-                  Build ID: {buildInfo.buildId}
-                </div>
-              </div>
-
-              {/* Installation Instructions */}
-              <div className="mt-8 p-6 bg-gray-50 rounded-xl">
-                <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
-                  <InformationCircleIcon className="w-5 h-5 mr-2" />
-                  Installation Instructions
-                </h4>
-                <div className="text-sm text-gray-600 space-y-2">
-                  <p>
-                    <strong>Android:</strong>
+                  <p className="text-gray-700 mb-6 text-lg">
+                    Download the APK file for direct installation on Android
+                    devices. This is the official release from our build system.
                   </p>
-                  <ul className="list-disc list-inside space-y-1 ml-4">
-                    <li>Download the APK file above</li>
-                    <li>
-                      Enable "Install from unknown sources" in your device
-                      settings
-                    </li>
-                    <li>Open the downloaded APK file</li>
-                    <li>Follow the installation prompts</li>
-                  </ul>
+
+                  {/* Download Button - ENHANCED */}
+                  <button
+                    onClick={handleDownload}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-5 px-8 rounded-xl flex items-center justify-center transition-all duration-200 text-xl shadow-lg hover:shadow-xl transform hover:scale-105"
+                  >
+                    <CloudArrowDownIcon className="w-7 h-7 mr-3" />
+                    Download APK v{buildInfo.version}
+                  </button>
+
+                  {/* Build Information */}
+                  <div className="mt-6 p-4 bg-white rounded-lg border border-green-200">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="font-semibold text-gray-600">
+                          Build ID:
+                        </span>
+                        <p className="text-gray-800 font-mono">
+                          {buildInfo.buildId}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-gray-600">
+                          Status:
+                        </span>
+                        <p className="text-green-600 font-medium capitalize">
+                          {buildInfo.status}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Installation Instructions - ENHANCED */}
+              <div className="mt-8 p-6 bg-blue-50 rounded-xl border border-blue-200">
+                <h4 className="font-bold text-blue-800 mb-4 flex items-center text-lg">
+                  <InformationCircleIcon className="w-6 h-6 mr-2" />
+                  📲 Installation Instructions
+                </h4>
+                <div className="text-blue-800 space-y-3">
+                  <div className="flex items-start">
+                    <span className="bg-blue-200 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">
+                      1
+                    </span>
+                    <p>
+                      <strong>Download:</strong> Click the download button above
+                      to get the APK file
+                    </p>
+                  </div>
+                  <div className="flex items-start">
+                    <span className="bg-blue-200 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">
+                      2
+                    </span>
+                    <p>
+                      <strong>Enable Unknown Sources:</strong> Go to Settings →
+                      Security → Unknown Sources (enable)
+                    </p>
+                  </div>
+                  <div className="flex items-start">
+                    <span className="bg-blue-200 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">
+                      3
+                    </span>
+                    <p>
+                      <strong>Install:</strong> Open the downloaded APK file and
+                      follow the prompts
+                    </p>
+                  </div>
+                  <div className="flex items-start">
+                    <span className="bg-blue-200 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5">
+                      4
+                    </span>
+                    <p>
+                      <strong>Enjoy:</strong> Launch ThePirithApp and explore
+                      the Buddhist texts
+                    </p>
+                  </div>
+                </div>
+
+                {/* Important Note */}
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-start">
+                    <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600 mr-2 mt-0.5 flex-shrink-0" />
+                    <p className="text-yellow-800 text-sm">
+                      <strong>Note:</strong> This APK is built for Android
+                      devices. Make sure to download from this official website
+                      only.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Alternative Download Links */}
+              <div className="mt-6 text-center">
+                <p className="text-gray-600 mb-3">
+                  Need help? Check our other resources:
+                </p>
+                <div className="flex justify-center space-x-4">
+                  <a
+                    href="https://github.com/akindukodithuwakku/PirithApp/releases"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-buddhist-600 hover:text-buddhist-700 font-medium hover:underline"
+                  >
+                    GitHub Releases
+                  </a>
+                  <a
+                    href="https://expo.dev/accounts/akindu2002/projects/thepirithapp"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-buddhist-600 hover:text-buddhist-700 font-medium hover:underline"
+                  >
+                    Expo Builds
+                  </a>
                 </div>
               </div>
             </div>
